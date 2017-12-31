@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
 @Throws(IOException::class)
 private fun defineAst(
         outputDir: String, baseName: String, types: List<String>) {
-    val path = "${System.getProperty("user.dir")}/$outputDir/$baseName.kt"
+    val path = "${System.getProperty("user.dir")}/ast/src/$outputDir/$baseName.kt"
 
     val file = File(path)
     file.parentFile.mkdirs()
