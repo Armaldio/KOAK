@@ -18,14 +18,12 @@ class Scanner(private val source: String) {
         return tokens
     }
 
-    private fun error(line: Int, message: String) {
-        report(line, "", message)
-    }
-
-    private fun report(line: Int, where: String, message: String) {
-        System.err.println(
-                "[line $line] Error$where: $message")
-        hadError = true
+    private fun report(line: Int, column: Int, where: String, message: String) {
+        System.err.println("[line $line] Error$where: $message")
+        System.err.println(source.split("\n")[line - 1])
+        for (i in 1..(column - 1)) System.err.print(" ")
+        System.err.println("^")
+        throw Exception(message)
     }
 
     private fun isAtEnd(): Boolean {
@@ -69,7 +67,7 @@ class Scanner(private val source: String) {
 
         // Unterminated string.
         if (isAtEnd()) {
-            this.error(line, "Unterminated string.")
+            this.report(line, 0, "", "Unterminated string.")
             return
         }
 
@@ -133,6 +131,7 @@ class Scanner(private val source: String) {
             '+' -> addToken(TokenType.PLUS)
             ';' -> addToken(TokenType.SEMICOLON)
             '*' -> addToken(TokenType.STAR)
+            '#' -> addToken(TokenType.COMMENT)
             '/' -> if (match('/')) while (peek() != '\n' && !isAtEnd()) advance() else addToken(TokenType.SLASH)
 
             '!' -> addToken(if (this.match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
@@ -142,6 +141,8 @@ class Scanner(private val source: String) {
 
             ' ', '\r', '\t' -> Unit
 
+            '\'' -> Unit //TODO it's only temporary
+
             '\n' -> line++
 
             '"' -> string()
@@ -149,7 +150,7 @@ class Scanner(private val source: String) {
             else -> when {
                 isDigit(c) -> number()
                 isAlpha(c) -> identifier()
-                else -> this.error(line, "Unexpected character.")
+                else -> this.report(line, current, "", "Unexpected character.")
             }
 
         }
