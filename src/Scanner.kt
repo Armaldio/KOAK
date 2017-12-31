@@ -7,6 +7,26 @@ class Scanner(private val source: String) {
 
     private var hadError = false
 
+    /* ******* */
+
+    private var keywords: MutableMap<String, TokenType> = mutableMapOf<String, TokenType>(
+            "and" to TokenType.AND,
+            "class" to TokenType.CLASS,
+            "else" to TokenType.ELSE,
+            "false" to TokenType.FALSE,
+            "for" to TokenType.FOR,
+            "def" to TokenType.DEF,
+            "if" to TokenType.IF,
+            "null" to TokenType.NULL,
+            "or" to TokenType.OR,
+            "print" to TokenType.PRINT,
+            "return" to TokenType.RETURN,
+            "super" to TokenType.SUPER,
+            "this" to TokenType.THIS,
+            "true" to TokenType.TRUE,
+            "while" to TokenType.WHILE
+    )
+
     fun scanTokens(): MutableList<Token> {
         while (!isAtEnd()) {
             // We are at the beginning of the next lexeme.
@@ -105,7 +125,11 @@ class Scanner(private val source: String) {
     private fun identifier() {
         while (isAlphaNumeric(peek())) advance()
 
-        addToken(TokenType.IDENTIFIER)
+        val text = source.substring(start, current)
+
+        var type = keywords[text]
+        if (type == null) type = TokenType.IDENTIFIER
+        addToken(type)
     }
 
     private fun isAlpha(c: Char): Boolean {
@@ -143,7 +167,10 @@ class Scanner(private val source: String) {
 
             '\'' -> Unit //TODO it's only temporary
 
-            '\n' -> line++
+            '\n' -> {
+                addToken(TokenType.EOL)
+                line++
+            }
 
             '"' -> string()
 

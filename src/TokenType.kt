@@ -11,6 +11,7 @@ enum class TokenType {
     GREATER, GREATER_EQUAL,
     LESS, LESS_EQUAL,
     COMMENT,
+    EOL,
 
     // Literals.
     IDENTIFIER,
@@ -18,8 +19,9 @@ enum class TokenType {
 
     // Keywords.
     AND,
-    CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
-    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+    CLASS, ELSE, FALSE, DEF, FOR, IF, NULL, OR,
+    PRINT, RETURN, SUPER, THIS, TRUE, WHILE,
 
     EOF
+
 }
