@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/ast/ast.iml" filepath="$PROJECT_DIR$/ast/ast.iml" />
       <module fileurl="file://$PROJECT_DIR$/koak.iml" filepath="$PROJECT_DIR$/koak.iml" />
     </modules>
   </component>
