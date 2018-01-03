@@ -3,6 +3,7 @@ class Scanner(private val source: String) {
 
     private var start = 0
     private var current = 0
+    private var column = 0
     private var line = 1
 
     private var hadError = false
@@ -18,6 +19,7 @@ class Scanner(private val source: String) {
             "def" to TokenType.DEF,
             "if" to TokenType.IF,
             "null" to TokenType.NULL,
+            "var" to TokenType.VAR,
             "or" to TokenType.OR,
             "print" to TokenType.PRINT,
             "return" to TokenType.RETURN,
@@ -52,6 +54,7 @@ class Scanner(private val source: String) {
 
     private fun advance(): Char {
         current++
+        column++
         return source[(current - 1)]
     }
 
@@ -170,6 +173,7 @@ class Scanner(private val source: String) {
             '\n' -> {
                 addToken(TokenType.EOL)
                 line++
+                column = 0
             }
 
             '"' -> string()
@@ -177,7 +181,7 @@ class Scanner(private val source: String) {
             else -> when {
                 isDigit(c) -> number()
                 isAlpha(c) -> identifier()
-                else -> this.report(line, current, "", "Unexpected character.")
+                else -> this.report(line, column, "", "Unexpected character.")
             }
 
         }

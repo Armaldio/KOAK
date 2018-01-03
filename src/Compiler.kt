@@ -16,9 +16,16 @@ class Compiler(file: String) {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
 
+        val parser = Parser(tokens)
+
+        val statements = parser.parse()
+
+
+
+
         // For now, just print the tokens.
-        for (token in tokens) {
-            System.out.println(token)
+        for (statement in statements) {
+            System.out.println(statement)
         }
     }
 }

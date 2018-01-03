@@ -11,7 +11,7 @@ enum class TokenType {
     GREATER, GREATER_EQUAL,
     LESS, LESS_EQUAL,
     COMMENT,
-    EOL,
+    EOL, VAR,
 
     // Literals.
     IDENTIFIER,

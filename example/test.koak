@@ -1,6 +1,7 @@
 # Compute the x'th fibonacci number.
 def fib(x)
-  if x < 3 then
+  int a = 3
+  if x < a then
     1
   else
     fib(x-1)+fib(x-2)
