@@ -1,4 +1,3 @@
 .gradle/**/*
 out/**/*
-
-ast/src/classes/**/*
+build/**/*

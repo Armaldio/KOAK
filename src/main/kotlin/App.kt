@@ -1,10 +1,11 @@
 fun main(args: Array<String>) {
+    println("--- Welcome to KOAK compiler ---")
     when (args.size) {
         0 -> repl()
         1 -> compile(args[0])
         else -> error("Too much parameters")
     }
-
+    println("---           End           ---")
 }
 
 fun repl() {
