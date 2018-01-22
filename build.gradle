@@ -28,6 +28,7 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.0'
 }
 
+/*
 run {
     args System.getProperty("exec.args").split()
-}
+}*/
