@@ -1,3 +1,4 @@
+
 class Scanner(private val source: String) {
     private val tokens = mutableListOf<Token>()
 
@@ -6,20 +7,17 @@ class Scanner(private val source: String) {
     private var column = 0
     private var line = 1
 
-    private var hadError = false
-
-    /* ******* */
-
-    private var keywords: MutableMap<String, TokenType> = mutableMapOf<String, TokenType>(
+    private var keywords: MutableMap<String, TokenType> = mutableMapOf(
             "and" to TokenType.AND,
             "class" to TokenType.CLASS,
             "else" to TokenType.ELSE,
             "false" to TokenType.FALSE,
             "for" to TokenType.FOR,
+            "string" to TokenType.STRING_TYPE,
+            "int" to TokenType.INT_TYPE,
             "def" to TokenType.DEF,
             "if" to TokenType.IF,
             "null" to TokenType.NULL,
-            "var" to TokenType.VAR,
             "or" to TokenType.OR,
             "print" to TokenType.PRINT,
             "return" to TokenType.RETURN,
@@ -156,12 +154,11 @@ class Scanner(private val source: String) {
             '.' -> addToken(TokenType.DOT)
             '-' -> addToken(TokenType.MINUS)
             '+' -> addToken(TokenType.PLUS)
-            ';' -> addToken(TokenType.SEMICOLON)
             '*' -> addToken(TokenType.STAR)
             '#' -> addToken(TokenType.COMMENT)
             '/' -> if (match('/')) while (peek() != '\n' && !isAtEnd()) advance() else addToken(TokenType.SLASH)
 
-            '!' -> addToken(if (this.match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
+            '!' -> addToken(if (this.match('=')) TokenType.NOT_EQUAL else TokenType.NOT)
             '=' -> addToken(if (this.match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
             '<' -> addToken(if (this.match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
             '>' -> addToken(if (this.match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)

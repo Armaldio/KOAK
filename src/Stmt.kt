@@ -1,98 +1,56 @@
-internal abstract class Stmt {
-    internal interface Visitor<R> {
-        fun visitBlockStmt(stmt: Block): R
-        fun visitClassStmt(stmt: Class): R
-        fun visitExpressionStmt(stmt: Expression): R
-        fun visitFunctionStmt(stmt: Function): R
-        fun visitIfStmt(stmt: If): R
-        fun visitPrintStmt(stmt: Print): R
-        fun visitReturnStmt(stmt: Return): R
-        fun visitVarStmt(stmt: Var): R
-        fun visitWhileStmt(stmt: While): R
-    }
+abstract class Stmt {
 
-    // Nested Stmt classes here...
-    //> stmt-block
     internal class Block(val statements: List<Stmt>) : Stmt() {
-
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitBlockStmt(this)
+        override fun toString(): String {
+            return "Block(statements=$statements)"
         }
     }
 
-    //< stmt-block
-    //> stmt-class
     internal class Class(val name: Token, val superclass: Expr?, val methods: List<Function>) : Stmt() {
-
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitClassStmt(this)
+        override fun toString(): String {
+            return "Class(name=$name, superclass=$superclass, methods=$methods)"
         }
     }
 
-    //< stmt-class
-    //> stmt-expression
     internal class Expression(val expression: Expr) : Stmt() {
-
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitExpressionStmt(this)
+        override fun toString(): String {
+            return "Expression(expression=$expression)"
         }
     }
 
-    //< stmt-expression
-    //> stmt-function
     internal class Function(val name: Token, val parameters: List<Token>, val body: List<Stmt>) : Stmt() {
-
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitFunctionStmt(this)
+        override fun toString(): String {
+            return "Function(name=$name, parameters=$parameters, body=$body)"
         }
     }
 
-    //< stmt-function
-    //> stmt-if
     internal class If(val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt?) : Stmt() {
-
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitIfStmt(this)
+        override fun toString(): String {
+            return "If(condition=$condition, thenBranch=$thenBranch, elseBranch=$elseBranch)"
         }
     }
 
-    //< stmt-if
-    //> stmt-print
     internal class Print(val expression: Expr) : Stmt() {
-
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitPrintStmt(this)
+        override fun toString(): String {
+            return "Print(expression=$expression)"
         }
     }
 
-    //< stmt-print
-    //> stmt-return
     internal class Return(val keyword: Token, val value: Expr?) : Stmt() {
-
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitReturnStmt(this)
+        override fun toString(): String {
+            return "Return(keyword=$keyword, value=$value)"
         }
     }
 
-    //< stmt-return
-    //> stmt-var
-    internal class Var(val name: Token, val initializer: Expr?) : Stmt() {
-
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitVarStmt(this)
+    internal class Var(val type: String, val name: Token, val initializer: Expr?) : Stmt() {
+        override fun toString(): String {
+            return "Var(type='$type', name=$name, initializer=$initializer)"
         }
     }
 
-    //< stmt-var
-    //> stmt-while
     internal class While(val condition: Expr, val body: Stmt) : Stmt() {
-
-        override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitWhileStmt(this)
+        override fun toString(): String {
+            return "While(condition=$condition, body=$body)"
         }
     }
-    //< stmt-while
-
-    internal abstract fun <R> accept(visitor: Visitor<R>): R
 }
-//< Appendix II stmt

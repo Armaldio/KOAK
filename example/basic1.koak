@@ -1,1 +1,2 @@
-var language = "lox";
+string language = "koak"
+print(koak)
