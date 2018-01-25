@@ -1,10 +1,11 @@
 fun main(args: Array<String>) {
+    println("--- Welcome to KOAK compiler ---")
     when (args.size) {
         0 -> repl()
         1 -> compile(args[0])
         else -> error("Too much parameters")
     }
-
+    println("---           End           ---")
 }
 
 fun repl() {
@@ -24,5 +25,11 @@ ready> """)
 
 fun compile(file: String) {
     val compiler = Compiler(file)
-    compiler.compile()
+    val ast = compiler.compile()
+
+
+    for ((index, statement) in ast.withIndex()) {
+        System.out.println("$index: $statement")
+    }
 }
+

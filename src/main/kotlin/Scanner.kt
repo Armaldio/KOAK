@@ -3,9 +3,28 @@ class Scanner(private val source: String) {
 
     private var start = 0
     private var current = 0
+    private var column = 0
     private var line = 1
 
-    private var hadError = false
+    private var keywords: MutableMap<String, TokenType> = mutableMapOf(
+            "and" to TokenType.AND,
+            "class" to TokenType.CLASS,
+            "else" to TokenType.ELSE,
+            "false" to TokenType.FALSE,
+            "for" to TokenType.FOR,
+            "string" to TokenType.STRING_TYPE,
+            "int" to TokenType.INT_TYPE,
+            "def" to TokenType.DEF,
+            "if" to TokenType.IF,
+            "null" to TokenType.NULL,
+            "or" to TokenType.OR,
+            "print" to TokenType.PRINT,
+            "return" to TokenType.RETURN,
+            "super" to TokenType.SUPER,
+            "this" to TokenType.THIS,
+            "true" to TokenType.TRUE,
+            "while" to TokenType.WHILE
+    )
 
     fun scanTokens(): MutableList<Token> {
         while (!isAtEnd()) {
@@ -18,14 +37,12 @@ class Scanner(private val source: String) {
         return tokens
     }
 
-    private fun error(line: Int, message: String) {
-        report(line, "", message)
-    }
-
-    private fun report(line: Int, where: String, message: String) {
-        System.err.println(
-                "[line $line] Error$where: $message")
-        hadError = true
+    private fun report(line: Int, column: Int, where: String, message: String) {
+        System.err.println("[line $line] Error$where: $message")
+        System.err.println(source.split("\n")[line - 1])
+        for (i in 1..(column - 1)) System.err.print(" ")
+        System.err.println("^")
+        throw Exception(message)
     }
 
     private fun isAtEnd(): Boolean {
@@ -34,6 +51,7 @@ class Scanner(private val source: String) {
 
     private fun advance(): Char {
         current++
+        column++
         return source[(current - 1)]
     }
 
@@ -69,7 +87,7 @@ class Scanner(private val source: String) {
 
         // Unterminated string.
         if (isAtEnd()) {
-            this.error(line, "Unterminated string.")
+            this.report(line, 0, "", "Unterminated string.")
             return
         }
 
@@ -107,7 +125,11 @@ class Scanner(private val source: String) {
     private fun identifier() {
         while (isAlphaNumeric(peek())) advance()
 
-        addToken(TokenType.IDENTIFIER)
+        val text = source.substring(start, current)
+
+        var type = keywords[text]
+        if (type == null) type = TokenType.IDENTIFIER
+        addToken(type)
     }
 
     private fun isAlpha(c: Char): Boolean {
@@ -128,28 +150,36 @@ class Scanner(private val source: String) {
             '{' -> addToken(TokenType.LEFT_BRACE)
             '}' -> addToken(TokenType.RIGHT_BRACE)
             ',' -> addToken(TokenType.COMMA)
+            ':' -> addToken(TokenType.COLON)
+            ';' -> addToken(TokenType.SEMICOLON)
             '.' -> addToken(TokenType.DOT)
             '-' -> addToken(TokenType.MINUS)
             '+' -> addToken(TokenType.PLUS)
-            ';' -> addToken(TokenType.SEMICOLON)
             '*' -> addToken(TokenType.STAR)
+            '#' -> addToken(TokenType.COMMENT)
             '/' -> if (match('/')) while (peek() != '\n' && !isAtEnd()) advance() else addToken(TokenType.SLASH)
 
-            '!' -> addToken(if (this.match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
+            '!' -> addToken(if (this.match('=')) TokenType.NOT_EQUAL else TokenType.NOT)
             '=' -> addToken(if (this.match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
             '<' -> addToken(if (this.match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
             '>' -> addToken(if (this.match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
 
             ' ', '\r', '\t' -> Unit
 
-            '\n' -> line++
+            '\'' -> Unit //TODO it's only temporary
+
+            '\n' -> {
+                addToken(TokenType.EOL)
+                line++
+                column = 0
+            }
 
             '"' -> string()
 
             else -> when {
                 isDigit(c) -> number()
                 isAlpha(c) -> identifier()
-                else -> this.error(line, "Unexpected character.")
+                else -> this.report(line, column, "", "Unexpected character.")
             }
 
         }
