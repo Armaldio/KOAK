@@ -181,6 +181,7 @@ internal class Parser(private val tokens: List<Token>) {
         }
 
         //consume(TokenType.EOL, "Expect 'EOL' after variable declaration.")
+        synchronize()
         return Stmt.Var(type, name, initializer)
     }
 
@@ -231,6 +232,7 @@ internal class Parser(private val tokens: List<Token>) {
         consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
         consume(TokenType.COLON, "Expect ':' before function body.")
         val body = expression()
+        synchronize()
         return Stmt.Function(name, parameters, body)
 
     }
@@ -451,6 +453,9 @@ internal class Parser(private val tokens: List<Token>) {
         throw error(peek(), message)
     }
 
+    /**
+     * Check if the next char is one of the type from types
+     */
     private fun consume(types: ArrayList<TokenType>, message: String): Token {
         types.forEach { if (check(it)) return advance() }
         throw error(peek(), message)
@@ -464,16 +469,24 @@ internal class Parser(private val tokens: List<Token>) {
         return if (isAtEnd) false else peek().type === tokenType
     }
 
-
+    /**
+     * If not at the end, advance and return previous token
+     */
     private fun advance(): Token {
         if (!isAtEnd) current++
         return previous()
     }
 
+    /**
+     * Return current token
+     */
     private fun peek(): Token {
         return tokens[current]
     }
 
+    /**
+     * Return previous token
+     */
     private fun previous(): Token {
         return tokens[current - 1]
     }

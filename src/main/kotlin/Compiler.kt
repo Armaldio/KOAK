@@ -9,7 +9,7 @@ class Compiler(file: String) {
         this._file = file
     }
 
-    fun compile() {
+    fun compile(): List<Stmt?> {
         println("Compiling ${this._file}...")
 
         val source: String = File(this._file).readLines().joinToString(separator = "\n")
@@ -20,9 +20,9 @@ class Compiler(file: String) {
 
         val statements = parser.parse()
 
-        // For now, just print the tokens.
-        for ((index, statement) in statements.withIndex()) {
-            System.out.println("$index: $statement")
-        }
+        val ast = AST()
+        statements.filterNotNullTo(ast)
+
+        return ast
     }
 }

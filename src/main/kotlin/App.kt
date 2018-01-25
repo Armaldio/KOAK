@@ -25,5 +25,11 @@ ready> """)
 
 fun compile(file: String) {
     val compiler = Compiler(file)
-    compiler.compile()
+    val ast = compiler.compile()
+
+
+    for ((index, statement) in ast.withIndex()) {
+        System.out.println("$index: $statement")
+    }
 }
+
