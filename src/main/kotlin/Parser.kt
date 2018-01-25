@@ -407,7 +407,7 @@ internal class Parser(private val tokens: List<Token>) {
         when {
             match(TokenType.FALSE) -> return Expr.Literal(false)
             match(TokenType.TRUE) -> return Expr.Literal(true)
-            match(TokenType.NULL) -> return Expr.Literal(null!!)
+            match(TokenType.NULL) -> return Expr.Literal("null")
             match(TokenType.NUMBER, TokenType.STRING) -> return Expr.Literal(previous().literal!!)
             match(TokenType.SUPER) -> {
                 val keyword = previous()
@@ -504,9 +504,7 @@ internal class Parser(private val tokens: List<Token>) {
         while (!isAtEnd) {
             if (previous().type === TokenType.EOL) return
 
-            when (peek().type) {
-                TokenType.CLASS, TokenType.DEF, TokenType.INT_TYPE, TokenType.STRING_TYPE, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.PRINT, TokenType.RETURN -> return
-            }
+            if (peek().type == TokenType.CLASS || peek().type == TokenType.DEF || peek().type == TokenType.INT_TYPE || peek().type == TokenType.STRING_TYPE || peek().type == TokenType.FOR || peek().type == TokenType.IF || peek().type == TokenType.WHILE || peek().type == TokenType.PRINT || peek().type == TokenType.RETURN) return
 
             advance()
         }
