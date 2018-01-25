@@ -150,6 +150,8 @@ class Scanner(private val source: String) {
             '{' -> addToken(TokenType.LEFT_BRACE)
             '}' -> addToken(TokenType.RIGHT_BRACE)
             ',' -> addToken(TokenType.COMMA)
+            ':' -> addToken(TokenType.COLON)
+            ';' -> addToken(TokenType.SEMICOLON)
             '.' -> addToken(TokenType.DOT)
             '-' -> addToken(TokenType.MINUS)
             '+' -> addToken(TokenType.PLUS)

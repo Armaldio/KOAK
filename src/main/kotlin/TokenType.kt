@@ -1,7 +1,7 @@
 enum class TokenType {
     // Single-character tokens.
     LEFT_PAREN,
-    RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, COMMA, DOT, MINUS, PLUS, SLASH, STAR,
+    RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, COMMA, DOT, MINUS, PLUS, SLASH, STAR, COLON, SEMICOLON,
 
     // One or two character tokens.
     NOT,
@@ -13,7 +13,8 @@ enum class TokenType {
     EOL,
 
     //types
-    STRING_TYPE, INT_TYPE,
+    STRING_TYPE,
+    INT_TYPE,
 
     // Literals.
     IDENTIFIER,
@@ -25,5 +26,4 @@ enum class TokenType {
     PRINT, RETURN, SUPER, THIS, TRUE, WHILE,
 
     EOF
-
 }

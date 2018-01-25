@@ -3,11 +3,17 @@ import java.util.ArrayList
 internal class Parser(private val tokens: List<Token>) {
     private var current = 0
 
+    /**
+     * Return true at the end of the file
+     */
     private val isAtEnd: Boolean
         get() = peek().type === TokenType.EOF
 
     private class ParseError : RuntimeException()
 
+    /**
+     * Get a list of statements from the file
+     */
     fun parse(): List<Stmt?> {
         val statements = ArrayList<Stmt?>()
         while (!isAtEnd) {
@@ -24,11 +30,7 @@ internal class Parser(private val tokens: List<Token>) {
         return try {
             when {
             //match(TokenType.CLASS) -> classDeclaration()
-                match(TokenType.DEF) -> function("function")
-                match(TokenType.COMMENT) -> {
-                    consume(TokenType.EOL, "Single line comment")
-                    null
-                }
+                match(TokenType.DEF) -> function()
                 match(TokenType.STRING_TYPE) -> varDeclaration("string")
                 match(TokenType.INT_TYPE) -> varDeclaration("int")
                 else -> statement()
@@ -73,6 +75,7 @@ internal class Parser(private val tokens: List<Token>) {
             match(TokenType.PRINT) -> return printStmt()
             match(TokenType.RETURN) -> return returnStmt()
             match(TokenType.WHILE) -> return whileStmt()
+            match(TokenType.COMMENT) -> return commentStmt()
             else -> return if (match(TokenType.LEFT_BRACE)) Stmt.Block(block()) else expressionStmt()
         }
     }
@@ -177,10 +180,14 @@ internal class Parser(private val tokens: List<Token>) {
             initializer = expression()
         }
 
-        consume(TokenType.EOL, "Expect 'EOL' after variable declaration.")
+        //consume(TokenType.EOL, "Expect 'EOL' after variable declaration.")
         return Stmt.Var(type, name, initializer)
     }
 
+    private fun commentStmt(): Stmt {
+        val comment = consume(TokenType.EOL, "Expect EOL")
+        return Stmt.Comment(comment)
+    }
 
     private fun whileStmt(): Stmt {
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
@@ -194,31 +201,36 @@ internal class Parser(private val tokens: List<Token>) {
 
     private fun expressionStmt(): Stmt {
         val expr = expression()
-        consume(TokenType.EOL, "Expect 'EOL' after expression.")
+        //consume(TokenType.EOL, "Expect 'EOL' after expression.")
         return Stmt.Expression(expr)
     }
 
 
-    private fun function(kind: String): Stmt.Function {
-        val name = consume(TokenType.IDENTIFIER, "Expect $kind name.")
+    private fun function(): Stmt.Function {
+        val name = consume(TokenType.IDENTIFIER, "Expect function name.")
 
-        consume(TokenType.LEFT_PAREN, "Expect '(' after $kind name.")
-        val parameters = ArrayList<Token>()
+        consume(TokenType.LEFT_PAREN, "Expect '(' after function name.")
+        val parameters = ArrayList<Stmt.Parameter>()
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (parameters.size >= 8) {
                     error(peek(), "Cannot have more than 8 parameters.")
                 }
 
-                parameters.add(consume(TokenType.IDENTIFIER, "Expect parameter name."))
+                if (match(TokenType.COMMA))
+                    consume(TokenType.COMMA, "Expect ',' between each parameters")
+
+                val paramname = consume(TokenType.IDENTIFIER, "Expect parameter name.")
+                consume(TokenType.COLON, "Expect ':' after parameter name")
+                val type = consume(arrayListOf(TokenType.INT_TYPE, TokenType.STRING_TYPE), "Expect parameter type.")
+
+                val param = Stmt.Parameter(paramname, type)
+                parameters.add(param)
             } while (match(TokenType.COMMA))
         }
         consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
-
-
-
-        consume(TokenType.LEFT_BRACE, "Expect '{' before $kind body.")
-        val body = block()
+        consume(TokenType.COLON, "Expect ':' before function body.")
+        val body = expression()
         return Stmt.Function(name, parameters, body)
 
     }
@@ -227,20 +239,16 @@ internal class Parser(private val tokens: List<Token>) {
     private fun block(): List<Stmt> {
         val statements = ArrayList<Stmt>()
 
-        while (!check(TokenType.RIGHT_BRACE) && !isAtEnd) {
+        while (!check(TokenType.COLON) && !isAtEnd) {
             statements.add(this.declaration()!!)
         }
 
-        consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
+        consume(TokenType.SEMICOLON, "Expect ';' after block.")
         return statements
     }
 
 
     private fun assignment(): Expr {
-        /* Stmts and State parse-assignment < Control Flow or-in-assignment
-    Expr expr = equality();
-*/
-
         val expr = or()
 
 
@@ -348,10 +356,6 @@ internal class Parser(private val tokens: List<Token>) {
             return Expr.Unary(operator, right)
         }
 
-        /* Parsing Expressions unary < Functions unary-call
-    return primary();
-*/
-
         return call()
 
     }
@@ -398,40 +402,28 @@ internal class Parser(private val tokens: List<Token>) {
 
 
     private fun primary(): Expr {
-        if (match(TokenType.FALSE)) return Expr.Literal(false)
-        if (match(TokenType.TRUE)) return Expr.Literal(true)
-        if (match(TokenType.NULL)) return Expr.Literal(null!!)
-
-        if (match(TokenType.NUMBER, TokenType.STRING)) {
-            return Expr.Literal(previous().literal!!)
+        when {
+            match(TokenType.FALSE) -> return Expr.Literal(false)
+            match(TokenType.TRUE) -> return Expr.Literal(true)
+            match(TokenType.NULL) -> return Expr.Literal(null!!)
+            match(TokenType.NUMBER, TokenType.STRING) -> return Expr.Literal(previous().literal!!)
+            match(TokenType.SUPER) -> {
+                val keyword = previous()
+                consume(TokenType.DOT, "Expect '.' after 'super'.")
+                val method = consume(TokenType.IDENTIFIER,
+                        "Expect superclass method name.")
+                return Expr.Super(keyword, method)
+            }
+            match(TokenType.THIS) -> return Expr.This(previous())
+            match(TokenType.IDENTIFIER) -> return Expr.Variable(previous())
+            match(TokenType.LEFT_PAREN) -> {
+                val expr = expression()
+                consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+                return Expr.Grouping(expr)
+            }
+            match(TokenType.SEMICOLON) -> Expr.Literal(previous())
+            match(TokenType.EOL) -> advance()
         }
-
-
-        if (match(TokenType.SUPER)) {
-            val keyword = previous()
-            consume(TokenType.DOT, "Expect '.' after 'super'.")
-            val method = consume(TokenType.IDENTIFIER,
-                    "Expect superclass method name.")
-            return Expr.Super(keyword, method)
-        }
-
-
-
-        if (match(TokenType.THIS)) return Expr.This(previous())
-
-
-
-        if (match(TokenType.IDENTIFIER)) {
-            return Expr.Variable(previous())
-        }
-
-
-        if (match(TokenType.LEFT_PAREN)) {
-            val expr = expression()
-            consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return Expr.Grouping(expr)
-        }
-
 
         throw error(peek(), "Expect expression.")
 
@@ -450,13 +442,24 @@ internal class Parser(private val tokens: List<Token>) {
     }
 
 
+    /**
+     * Check if the next char is of type type
+     */
     private fun consume(type: TokenType, message: String): Token {
         if (check(type)) return advance()
 
         throw error(peek(), message)
     }
 
+    private fun consume(types: ArrayList<TokenType>, message: String): Token {
+        types.forEach { if (check(it)) return advance() }
+        throw error(peek(), message)
+    }
 
+    /**
+     * Check if current char is type of toeknType
+     * @property tokenType the type of the token
+     */
     private fun check(tokenType: TokenType): Boolean {
         return if (isAtEnd) false else peek().type === tokenType
     }
@@ -477,7 +480,7 @@ internal class Parser(private val tokens: List<Token>) {
 
 
     private fun error(token: Token, message: String): ParseError {
-        println("Error: $message instead got $token")
+        println("Error: $message instead got [$token, ${token.type}]")
         return ParseError()
     }
 

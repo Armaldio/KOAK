@@ -21,8 +21,8 @@ class Compiler(file: String) {
         val statements = parser.parse()
 
         // For now, just print the tokens.
-        for (statement in statements) {
-            System.out.println(statement)
+        for ((index, statement) in statements.withIndex()) {
+            System.out.println("$index: $statement")
         }
     }
 }

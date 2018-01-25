@@ -18,7 +18,7 @@ abstract class Stmt {
         }
     }
 
-    internal class Function(val name: Token, val parameters: List<Token>, val body: List<Stmt>) : Stmt() {
+    internal class Function(val name: Token, val parameters: List<Parameter>, val body: Expr) : Stmt() {
         override fun toString(): String {
             return "Function(name=$name, parameters=$parameters, body=$body)"
         }
@@ -51,6 +51,18 @@ abstract class Stmt {
     internal class While(val condition: Expr, val body: Stmt) : Stmt() {
         override fun toString(): String {
             return "While(condition=$condition, body=$body)"
+        }
+    }
+
+    internal class Comment(val comment: Token) : Stmt() {
+        override fun toString(): String {
+            return "Comment(comment=$comment)"
+        }
+    }
+
+    internal class Parameter(val name: Token, val type: Token) : Stmt() {
+        override fun toString(): String {
+            return "Parameter(name=$name, type=$type)"
         }
     }
 }

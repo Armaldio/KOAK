@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Epitech-KOAK.iml" filepath="$PROJECT_DIR$/.idea/modules/Epitech-KOAK.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/KOAK.iml" filepath="$PROJECT_DIR$/.idea/modules/KOAK.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/KOAK_main.iml" filepath="$PROJECT_DIR$/.idea/modules/KOAK_main.iml" group="KOAK" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/KOAK_test.iml" filepath="$PROJECT_DIR$/.idea/modules/KOAK_test.iml" group="KOAK" />
       <module fileurl="file://$PROJECT_DIR$/koak.iml" filepath="$PROJECT_DIR$/koak.iml" />

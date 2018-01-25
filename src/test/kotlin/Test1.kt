@@ -1,7 +1,7 @@
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
 
-class MyTest {
+class FilesTest {
 
     @Test
     fun testsWork() {
