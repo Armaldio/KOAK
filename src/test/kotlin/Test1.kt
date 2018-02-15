@@ -35,7 +35,7 @@ class FilesTest {
         val ast = this.parse("int a = 3")
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "Var(type='int', name=a, initializer=Literal(value=3.0))")
+        assertEquals(ast[0].toString(), "Var(type='int', name=a, initializer=Literal(value=3))")
     }
 
     @Test
@@ -43,7 +43,7 @@ class FilesTest {
         val ast = this.parse("int a = 3 + 3")
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "Var(type='int', name=a, initializer=Binary(left=Literal(value=3.0), operator=+, right=Literal(value=3.0)))")
+        assertEquals(ast[0].toString(), "Var(type='int', name=a, initializer=Binary(left=Literal(value=3), operator=+, right=Literal(value=3)))")
 
     }
 
@@ -52,7 +52,7 @@ class FilesTest {
         val ast = this.parse("int sum = add(10, 5);")
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "Var(type='int', name=sum, initializer=Call(callee=Variable(name=add), paren=), arguments=[Literal(value=10.0), Literal(value=5.0)]))")
+        assertEquals(ast[0].toString(), "Var(type='int', name=sum, initializer=Call(callee=Variable(name=add), paren=), arguments=[Literal(value=10), Literal(value=5)]))")
     }
 
     @Ignore

@@ -1,6 +1,7 @@
 apply plugin: 'kotlin'
 apply plugin: 'application'
 //apply plugin: 'org.jetbrains.dokka'
+apply from: 'ColoredOutput.gradle'
 
 mainClassName  = "AppKt"
 
@@ -33,8 +34,8 @@ task wrapper(type: Wrapper) {
 
 tasks.withType(Test) { 
   testLogging {
-    exceptionFormat "full"
-    events "started", "skipped", "passed", "failed"
-    showStandardStreams true
+    //exceptionFormat "full"
+    //events "started", "skipped", "passed", "failed"
+    //showStandardStreams true
   }
 }
