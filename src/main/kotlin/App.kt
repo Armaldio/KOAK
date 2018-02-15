@@ -2,7 +2,7 @@ fun main(args: Array<String>) {
     println("--- Welcome to KOAK compiler ---")
     when (args.size) {
         0 -> repl()
-        1 -> compile(args[0])
+        1 -> getAST(args[0])
         else -> error("Too much parameters")
     }
     println("---           End           ---")
@@ -23,10 +23,11 @@ ready> """)
     } while (text !== null)
 }
 
-fun compile(file: String) {
+fun getAST(file: String) {
     val compiler = Compiler(file)
-    val ast = compiler.compile()
+    val ast = compiler.getAST()
 
+    compiler.toLLFile(ast, "output")
 
     for ((index, statement) in ast.withIndex()) {
         System.out.println("$index: $statement")

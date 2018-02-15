@@ -5,7 +5,7 @@ import org.junit.Test
 class FilesTest {
 
     fun parse(text: String): AST {
-        val scanner = Scanner(text)
+        val scanner = Lexer(text)
         val tokens = scanner.scanTokens()
 
         val parser = Parser(tokens)
@@ -21,7 +21,7 @@ class FilesTest {
     fun test() {
 
         val compiler = Compiler("example/test.koak")
-        val ast = compiler.compile()
+        val ast = compiler.getAST()
 
         assertEquals(ast.size, 2)
         assertTrue(ast[0] is Stmt.Function)

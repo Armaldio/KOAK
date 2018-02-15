@@ -1,4 +1,6 @@
-class Scanner(private val source: String) {
+import java.lang.Integer.parseInt
+
+class Lexer(private val source: String) {
     private val tokens = mutableListOf<Token>()
 
     private var start = 0
@@ -114,8 +116,7 @@ class Scanner(private val source: String) {
             while (isDigit(peek())) advance()
         }
 
-        addToken(TokenType.NUMBER,
-                java.lang.Double.parseDouble(source.substring(start, current)))
+        addToken(TokenType.NUMBER, parseInt(source.substring(start, current)))
     }
 
     private fun peekNext(): Char {

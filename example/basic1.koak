@@ -1,2 +1,2 @@
-string language = "koak"
-print(koak)
+int x = 15
+print(x)
