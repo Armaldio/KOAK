@@ -1,7 +1,7 @@
 enum class TokenType {
     // Single-character tokens.
     LEFT_PAREN,
-    RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, COMMA, DOT, MINUS, PLUS, SLASH, STAR, COLON, SEMICOLON,
+    RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET, RIGHT_BRACKET, COMMA, DOT, MINUS, PLUS, SLASH, STAR, COLON, SEMICOLON,
 
     // One or two character tokens.
     NOT,
@@ -23,7 +23,7 @@ enum class TokenType {
     // Keywords.
     AND,
     CLASS, ELSE, FALSE, DEF, FOR, IF, NULL, OR,
-    PRINT, RETURN, SUPER, THIS, TRUE, WHILE,
+    PRINT, RETURN, SUPER, THIS, TRUE, WHILE, THEN,
 
     EOF
 }

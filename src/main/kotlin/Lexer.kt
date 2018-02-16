@@ -18,6 +18,7 @@ class Lexer(private val source: String) {
             "int" to TokenType.INT_TYPE,
             "def" to TokenType.DEF,
             "if" to TokenType.IF,
+            "then" to TokenType.THEN,
             "null" to TokenType.NULL,
             "or" to TokenType.OR,
             "print" to TokenType.PRINT,
@@ -35,7 +36,7 @@ class Lexer(private val source: String) {
             scanToken()
         }
 
-        tokens.add(Token(TokenType.EOF, "", null, line))
+        tokens.add(Token(TokenType.EOF, "", null, line, column))
         return tokens
     }
 
@@ -64,7 +65,7 @@ class Lexer(private val source: String) {
     private fun addToken(type: TokenType, literal: Any?) {
         val text = source.substring(start, current)
 
-        val token = Token(type, text, literal, line)
+        val token = Token(type, text, literal, line, column)
 
         tokens.add(token)
     }
@@ -150,6 +151,8 @@ class Lexer(private val source: String) {
             ')' -> addToken(TokenType.RIGHT_PAREN)
             '{' -> addToken(TokenType.LEFT_BRACE)
             '}' -> addToken(TokenType.RIGHT_BRACE)
+            '[' -> addToken(TokenType.LEFT_BRACKET)
+            ']' -> addToken(TokenType.RIGHT_BRACKET)
             ',' -> addToken(TokenType.COMMA)
             ':' -> addToken(TokenType.COLON)
             ';' -> addToken(TokenType.SEMICOLON)
@@ -157,20 +160,25 @@ class Lexer(private val source: String) {
             '-' -> addToken(TokenType.MINUS)
             '+' -> addToken(TokenType.PLUS)
             '*' -> addToken(TokenType.STAR)
-            '#' -> addToken(TokenType.COMMENT)
+            '#' -> {
+                while (peek() != '\n' && !isAtEnd()) {
+                    advance()
+                }
+                if (peek() == '\n')
+                    advance()
+            }
             '/' -> if (match('/')) while (peek() != '\n' && !isAtEnd()) advance() else addToken(TokenType.SLASH)
-
             '!' -> addToken(if (this.match('=')) TokenType.NOT_EQUAL else TokenType.NOT)
             '=' -> addToken(if (this.match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
             '<' -> addToken(if (this.match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
             '>' -> addToken(if (this.match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
 
-            ' ', '\r', '\t' -> Unit
+            ' ', '\t' -> Unit
 
             '\'' -> Unit //TODO it's only temporary
 
             '\n' -> {
-                addToken(TokenType.EOL)
+                //addToken(TokenType.EOL)
                 line++
                 column = 0
             }

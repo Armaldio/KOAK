@@ -30,23 +30,23 @@ abstract class Stmt {
         }
     }
 
-    internal class Function(val name: Token, val parameters: List<Parameter>, val body: Expr) : Stmt() {
+    internal class Function(val name: Token, val parameters: List<Parameter>, val body: List<Stmt>, val returntype: Token) : Stmt() {
         override fun toString(): String {
-            return "Function(name=$name, parameters=$parameters, body=$body)"
+            return "Function(name=$name, parameters=$parameters, body=$body, returntype=$returntype)"
         }
 
         override fun getCode(): String {
             return """
 define void @${name.lexeme}(${parameters.joinToString { "i32 %" + it.name }}) {
 entry:
-  ${body.getCode()}
+  ${body.forEach { it.getCode() }}
   ret void
 }
                 """
         }
     }
 
-    internal class If(val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt?) : Stmt() {
+    internal class If(val condition: Expr, val thenBranch: List<Stmt>, val elseBranch: List<Stmt>) : Stmt() {
         override fun toString(): String {
             return "If(condition=$condition, thenBranch=$thenBranch, elseBranch=$elseBranch)"
         }
@@ -82,9 +82,9 @@ entry:
     /**
      * Variable definition
      */
-    internal class Var(val type: String, val name: Token, val initializer: Expr?) : Stmt() {
+    internal class VariableDefinition(val type: String, val name: Token, val initializer: Expr?) : Stmt() {
         override fun toString(): String {
-            return "Var(type='$type', name=$name, initializer=$initializer)"
+            return "VariableDefinition(type='$type', name=$name, initializer=$initializer)"
         }
 
         override fun getCode(): String {

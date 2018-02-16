@@ -17,7 +17,7 @@ class Compiler(file: String) {
         val lexer = Lexer(source)
         val tokens = lexer.scanTokens()
 
-        val parser = Parser(tokens)
+        val parser = Parser(tokens, source, this._file)
 
         val statements = parser.parse()
 
