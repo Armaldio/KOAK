@@ -15,7 +15,9 @@ class Lexer(private val source: String) {
             "false" to TokenType.FALSE,
             "for" to TokenType.FOR,
             "string" to TokenType.STRING_TYPE,
+            "void" to TokenType.VOID_TYPE,
             "int" to TokenType.INT_TYPE,
+            "char" to TokenType.CHAR_TYPE,
             "def" to TokenType.DEF,
             "if" to TokenType.IF,
             "then" to TokenType.THEN,
@@ -26,7 +28,8 @@ class Lexer(private val source: String) {
             "super" to TokenType.SUPER,
             "this" to TokenType.THIS,
             "true" to TokenType.TRUE,
-            "while" to TokenType.WHILE
+            "while" to TokenType.WHILE,
+            "extern" to TokenType.EXTERN
     )
 
     fun scanTokens(): MutableList<Token> {

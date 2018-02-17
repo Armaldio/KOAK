@@ -4,6 +4,7 @@ import kotlin.system.exitProcess
 internal class Parser(private val tokens: List<Token>, val source: String, val filename: String) {
     private var current = 0
 
+    private val typeList = arrayListOf<TokenType>(TokenType.CHAR_TYPE, TokenType.VOID_TYPE, TokenType.STRING_TYPE, TokenType.INT_TYPE)
     /**
      * Return true at the end of the file
      */
@@ -33,6 +34,7 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
             when {
                 match(TokenType.CLASS) -> classStmt()
                 match(TokenType.DEF) -> functionStmt()
+                match(TokenType.EXTERN) -> externStmt()
                 match(TokenType.STRING_TYPE) -> varDeclarationStmt("string")
                 match(TokenType.INT_TYPE) -> varDeclarationStmt("int")
                 else -> statement()
@@ -208,6 +210,35 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         return null
     }
 
+    private fun externStmt(): Stmt.Extern {
+        //consume(TokenType.EXTERN, "Expect extern identifier")
+        val name = consume(TokenType.IDENTIFIER, "Expect function name")
+
+        consume(TokenType.LEFT_PAREN, "Expect '(' after function name")
+        val parameters = ArrayList<Stmt.Parameter>()
+        if (!check(TokenType.RIGHT_PAREN)) {
+            do {
+                if (parameters.size >= 8) {
+                    error(peek(), "Cannot have more than 8 parameters.")
+                }
+
+                if (match(TokenType.COMMA))
+                    consume(TokenType.COMMA, "Expect ',' between each parameters")
+
+                val paramname = consume(TokenType.IDENTIFIER, "Expect parameter name.")
+                consume(TokenType.COLON, "Expect ':' after parameter name")
+                val type = consume(this.typeList, "Expect parameter type.")
+
+                val param = Stmt.Parameter(paramname, type)
+                parameters.add(param)
+            } while (match(TokenType.COMMA))
+        }
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
+        consume(TokenType.COLON, "Expect ':' after function definition")
+        val returntype = consume(this.typeList, "Expect parameter type.")
+        consume(TokenType.SEMICOLON, "Expect ';' after function body")
+        return Stmt.Extern(name, parameters, returntype)
+    }
 
     private fun functionStmt(): Stmt.Function {
         val name = consume(TokenType.IDENTIFIER, "Expect function name")
@@ -225,7 +256,7 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
 
                 val paramname = consume(TokenType.IDENTIFIER, "Expect parameter name.")
                 consume(TokenType.COLON, "Expect ':' after parameter name")
-                val type = consume(arrayListOf(TokenType.INT_TYPE, TokenType.STRING_TYPE), "Expect parameter type.")
+                val type = consume(typeList, "Expect parameter type.")
 
                 val param = Stmt.Parameter(paramname, type)
                 parameters.add(param)
@@ -233,12 +264,11 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         }
         consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
         consume(TokenType.COLON, "Expect ':' after function definition")
-        val returntype = consume(arrayListOf(TokenType.INT_TYPE, TokenType.STRING_TYPE), "Expect parameter type.")
+        val returntype = consume(this.typeList, "Expect parameter type.")
         val body = block()
         consume(TokenType.SEMICOLON, "Expect ';' after function body")
         return Stmt.Function(name, parameters, body, returntype)
     }
-
 
     private fun block(): List<Stmt> {
         val statements = ArrayList<Stmt>()

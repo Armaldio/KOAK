@@ -1,0 +1,11 @@
+extern putchar(c: char):void;
+
+def printdensity(d: int): int
+    if d > 8 then
+        putchar(32)  # ' '
+    else if d > 4 then
+        putchar(46)  # '.'
+    else if d > 2 then
+        putchar(43)  # '+'
+    else
+        putchar(42); # '*'

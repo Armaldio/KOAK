@@ -30,6 +30,16 @@ abstract class Stmt {
         }
     }
 
+    internal class Extern(val name: Token, val parameters: List<Parameter>, val returntype: Token) : Stmt() {
+        override fun toString(): String {
+            return "Extern Function(name=$name, parameters=$parameters, returntype=$returntype)"
+        }
+
+        override fun getCode(): String {
+            return ""
+        }
+    }
+
     internal class Function(val name: Token, val parameters: List<Parameter>, val body: List<Stmt>, val returntype: Token) : Stmt() {
         override fun toString(): String {
             return "Function(name=$name, parameters=$parameters, body=$body, returntype=$returntype)"

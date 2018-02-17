@@ -15,6 +15,8 @@ enum class TokenType {
     //types
     STRING_TYPE,
     INT_TYPE,
+    VOID_TYPE,
+    CHAR_TYPE,
 
     // Literals.
     IDENTIFIER,
@@ -24,6 +26,7 @@ enum class TokenType {
     AND,
     CLASS, ELSE, FALSE, DEF, FOR, IF, NULL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, WHILE, THEN,
+    EXTERN,
 
     EOF
 }
