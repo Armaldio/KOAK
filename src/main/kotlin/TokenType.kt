@@ -26,6 +26,7 @@ enum class TokenType {
     AND,
     CLASS, ELSE, FALSE, DEF, FOR, IF, NULL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, WHILE, THEN,
+    DO,
     EXTERN,
 
     EOF

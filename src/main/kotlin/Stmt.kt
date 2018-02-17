@@ -105,7 +105,7 @@ store i32 ${initializer?.getCode()}, i32* %${name.lexeme}, align 4
         }
     }
 
-    internal class While(val condition: Expr, val body: Stmt) : Stmt() {
+    internal class While(val condition: Expr, val body: List<Stmt>) : Stmt() {
         override fun toString(): String {
             return "While(condition=$condition, body=$body)"
         }

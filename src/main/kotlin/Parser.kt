@@ -74,7 +74,7 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
 
     private fun statement(): Stmt {
         return when {
-        //match(TokenType.FOR) -> return forStmt()
+            match(TokenType.FOR) -> forStmt()
             match(TokenType.IF) -> ifStmt()
             match(TokenType.PRINT) -> printStmt()
             match(TokenType.RETURN) -> returnStmt()
@@ -191,11 +191,18 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         return Stmt.VariableDefinition(type, name, initializer)
     }
 
-    private fun whileStmt(): Stmt {
+    private fun forStmt() : Stmt {
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
         val condition = expression()
         consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.")
-        val body = statement()
+        val body = this.block()
+        return Stmt.While(condition, body)
+    }
+
+    private fun whileStmt(): Stmt {
+        val condition = expression()
+        consume(TokenType.DO, "Expect 'do' after condition")
+        val body = this.block()
 
         return Stmt.While(condition, body)
     }
@@ -221,9 +228,6 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
                 if (parameters.size >= 8) {
                     error(peek(), "Cannot have more than 8 parameters.")
                 }
-
-                if (match(TokenType.COMMA))
-                    consume(TokenType.COMMA, "Expect ',' between each parameters")
 
                 val paramname = consume(TokenType.IDENTIFIER, "Expect parameter name.")
                 consume(TokenType.COLON, "Expect ':' after parameter name")
@@ -251,9 +255,6 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
                     error(peek(), "Cannot have more than 8 parameters.")
                 }
 
-                if (match(TokenType.COMMA))
-                    consume(TokenType.COMMA, "Expect ',' between each parameters")
-
                 val paramname = consume(TokenType.IDENTIFIER, "Expect parameter name.")
                 consume(TokenType.COLON, "Expect ':' after parameter name")
                 val type = consume(typeList, "Expect parameter type.")
@@ -273,7 +274,7 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
     private fun block(): List<Stmt> {
         val statements = ArrayList<Stmt>()
 
-        while (!isAtEnd) {
+        while (!this.isAtEnd) {
             statements.add(this.declaration()!!)
 
             // if no more expressions, exit

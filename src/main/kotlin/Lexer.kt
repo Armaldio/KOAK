@@ -14,7 +14,7 @@ class Lexer(private val source: String) {
             "else" to TokenType.ELSE,
             "false" to TokenType.FALSE,
             "for" to TokenType.FOR,
-            "string" to TokenType.STRING_TYPE,
+            "str" to TokenType.STRING_TYPE,
             "void" to TokenType.VOID_TYPE,
             "int" to TokenType.INT_TYPE,
             "char" to TokenType.CHAR_TYPE,
@@ -29,6 +29,7 @@ class Lexer(private val source: String) {
             "this" to TokenType.THIS,
             "true" to TokenType.TRUE,
             "while" to TokenType.WHILE,
+            "do" to TokenType.DO,
             "extern" to TokenType.EXTERN
     )
 
