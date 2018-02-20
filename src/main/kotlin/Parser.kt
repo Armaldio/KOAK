@@ -192,11 +192,22 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
     }
 
     private fun forStmt() : Stmt {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
+        val identifierAssigned = consume(TokenType.IDENTIFIER, "Expect identifier")
+        consume(TokenType.EQUAL, "Expect '=' after identifier")
         val condition = expression()
-        consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.")
+        consume(TokenType.COMMA, "Expect ','")
+        val identifierValue = consume(TokenType.IDENTIFIER, "Expect identifier")
+        consume(TokenType.LESS, "Expect less")
+        val condition2 = expression()
+        consume(TokenType.COMMA, "Expect ','")
+        val condition3 = expression()
+        consume(TokenType.IN, "Expect 'in' after for")
         val body = this.block()
-        return Stmt.While(condition, body)
+
+        val tokens = listOf(identifierAssigned, identifierValue)
+        val conditions = listOf(condition, condition2, condition3)
+
+        return Stmt.For(tokens, conditions, body)
     }
 
     private fun whileStmt(): Stmt {

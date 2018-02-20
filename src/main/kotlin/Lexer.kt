@@ -30,7 +30,8 @@ class Lexer(private val source: String) {
             "true" to TokenType.TRUE,
             "while" to TokenType.WHILE,
             "do" to TokenType.DO,
-            "extern" to TokenType.EXTERN
+            "extern" to TokenType.EXTERN,
+            "in" to TokenType.IN
     )
 
     fun scanTokens(): MutableList<Token> {
@@ -171,12 +172,27 @@ class Lexer(private val source: String) {
                 if (peek() == '\n')
                     advance()
             }
+            '|' -> {
+                when {
+                    this.match('|') -> addToken(TokenType.OR)
+                    this.match('=') -> addToken(TokenType.OR_ASSIGN)
+                    else -> {
+                        addToken(TokenType.PIPE)
+                    }
+                }
+            }
+            '&' -> {
+                when {
+                    this.match('&') -> addToken(TokenType.AND)
+                    this.match('=') -> addToken(TokenType.AND_ASSIGN)
+                    else -> addToken(TokenType.BINARY_AND)
+                }
+            }
             '/' -> if (match('/')) while (peek() != '\n' && !isAtEnd()) advance() else addToken(TokenType.SLASH)
             '!' -> addToken(if (this.match('=')) TokenType.NOT_EQUAL else TokenType.NOT)
             '=' -> addToken(if (this.match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
             '<' -> addToken(if (this.match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
             '>' -> addToken(if (this.match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
-
             ' ', '\t' -> Unit
 
             '\'' -> Unit //TODO it's only temporary

@@ -20,6 +20,16 @@ abstract class Stmt {
         }
     }
 
+    internal class For(val tokens: List<Token>, val conditions: List<Expr>, val body: List<Stmt>) : Stmt() {
+        override fun toString(): String {
+            return "For(identifier=$tokens, conditions=$conditions, body=$body)"
+        }
+
+        override fun getCode(): String {
+            return ""
+        }
+    }
+
     internal class Expression(val expression: Expr) : Stmt() {
         override fun toString(): String {
             return "Expression(expression=$expression)"
