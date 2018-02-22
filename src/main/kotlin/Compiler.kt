@@ -1,5 +1,6 @@
 import java.io.File
 import java.util.Scanner
+import kotlin.system.exitProcess
 
 class Compiler(file: String) {
     private var _file: String = ""
@@ -10,8 +11,9 @@ class Compiler(file: String) {
         this._file = file
     }
 
-    fun getAST(): AST {
-        println("Compiling ${this._file}...")
+    fun getAST(silence: Boolean = false): AST {
+        if (!silence)
+            println("Compiling ${this._file}...")
 
         val source: String = File(this._file).readLines().joinToString(separator = "\n")
         val lexer = Lexer(source)
@@ -27,7 +29,7 @@ class Compiler(file: String) {
         return ast
     }
 
-    fun toLLFile(ast: AST, filename: String) {
+    fun toLLFile(ast: AST): File {
         var outString = ""
 
         // declarations
@@ -57,16 +59,29 @@ define void @main() #0 {
 """
 
 
-        File("$filename.ll").printWriter().use { out -> out.println(outString) }
+        val llfile = createTempFile("output", ".ll")
+        llfile.deleteOnExit()
+        llfile.printWriter().use { out -> out.println(outString) }
 
+        return llfile
+    }
+
+
+    fun compile(llfile: File, path: String): File {
+        val exefile = File(path)
         val clangPath: String? = System.getenv("LLVM_HOME")
-        println("Clang path: $clangPath")
-        val proc = Runtime.getRuntime().exec("cmd /C $clangPath/bin/clang.exe $filename.ll")
+        if (clangPath == "")
+        {
+            println("You must define LLVM_HOME environment variable!\nPlease refer to the documentation https://google.com")
+            exitProcess(2)
+        }
+        val proc = Runtime.getRuntime().exec("""cmd /C $clangPath/bin/clang.exe ${llfile.absoluteFile} -o ${exefile.absoluteFile}""")
         Scanner(proc.inputStream).use {
             while (it.hasNextLine()) println(it.nextLine())
         }
         Scanner(proc.errorStream).use {
             while (it.hasNextLine()) println(it.nextLine())
         }
+        return exefile
     }
 }

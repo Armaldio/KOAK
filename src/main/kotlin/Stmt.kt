@@ -83,8 +83,8 @@ entry:
 
         override fun getCode(): String {
             return """
-                ${expression.getCode()}_ = load i32, i32* ${expression.getCode()}, align 4
-                call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i32 0, i32 0), i32 ${expression.getCode()}_)
+${expression.getCode()}_ = load i32, i32* ${expression.getCode()}, align 4
+call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i32 0, i32 0), i32 ${expression.getCode()}_)
                 """
         }
     }

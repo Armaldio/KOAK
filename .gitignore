@@ -68,3 +68,4 @@ modules.xml
 
 *.ll
 *.c
+dist/
