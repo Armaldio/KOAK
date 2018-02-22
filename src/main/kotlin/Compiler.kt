@@ -29,7 +29,9 @@ class Compiler(file: String) {
         return ast
     }
 
-    fun toLLFile(ast: AST): File {
+    fun toLLFile(_ast: AST): File {
+        var ast = _ast
+
         var outString = ""
 
         // declarations
@@ -40,7 +42,17 @@ class Compiler(file: String) {
         outString += ""
 
         // functions
-        outString += ""
+        val newAst = AST()
+        ast.forEach {
+            when (it) {
+                is Stmt.Function -> {
+                    val code = it.getCode()
+                    outString += code
+                }
+                else -> newAst.add(it)
+            }
+        }
+        ast = newAst
 
 
         // rest

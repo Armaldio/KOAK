@@ -3,6 +3,7 @@ import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     println("--- Welcome to KOAK compiler ---")
+    println("""Detected ${System.getProperty("os.name")} OS""")
     when (args.size) {
         0 -> repl()
         1 -> compile(args[0])

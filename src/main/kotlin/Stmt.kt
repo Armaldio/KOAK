@@ -36,7 +36,7 @@ abstract class Stmt {
         }
 
         override fun getCode(): String {
-            return ""
+            return expression.getCode()
         }
     }
 
@@ -56,10 +56,13 @@ abstract class Stmt {
         }
 
         override fun getCode(): String {
+            var bodyCode = ""
+            body.forEach { bodyCode += it.getCode() }
+
             return """
 define void @${name.lexeme}(${parameters.joinToString { "i32 %" + it.name }}) {
 entry:
-  ${body.forEach { it.getCode() }}
+  $bodyCode
   ret void
 }
                 """
@@ -118,16 +121,6 @@ store i32 ${initializer?.getCode()}, i32* %${name.lexeme}, align 4
     internal class While(val condition: Expr, val body: List<Stmt>) : Stmt() {
         override fun toString(): String {
             return "While(condition=$condition, body=$body)"
-        }
-
-        override fun getCode(): String {
-            return ""
-        }
-    }
-
-    internal class Comment(val comment: Token) : Stmt() {
-        override fun toString(): String {
-            return "Comment(comment=$comment)"
         }
 
         override fun getCode(): String {

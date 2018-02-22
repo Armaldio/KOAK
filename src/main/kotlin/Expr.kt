@@ -1,7 +1,6 @@
 import Token
 
 abstract class Expr {
-       // Nested Expr classes here...
 
     internal class Assign(val name: Token, val value: Expr) : Expr() {
         override fun toString(): String {
@@ -17,7 +16,12 @@ abstract class Expr {
             return "Binary(left=$left, operator=$operator, right=$right)"
         }
         override fun getCode(): String {
-            return ""
+            return when (operator.lexeme) {
+                "+" -> {
+                    "add nsw i32 ${left.getCode()}, ${right.getCode()}"
+                }
+                else -> ""
+            }
         }
     }
 
