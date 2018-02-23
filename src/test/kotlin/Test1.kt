@@ -94,7 +94,7 @@ class FilesTest {
         val ast = this.parse("def test(x : int) : int 1 + 2 + x;")
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "Function(name=test, parameters=[Parameter(name=x, type=int)], body=[Expression(expression=Binary(left=Binary(left=Literal(value=1), operator=+, right=Literal(value=2)), operator=+, right=Variable(name=x)))], returntype=int)")
+        assertEquals(ast[0].toString(), "Function(name=test, parameters=[Parameter(name=x, type=int)], body=[], returntype=ReturnValue(value=Expression(expression=Binary(left=Binary(left=Literal(value=1), operator=+, right=Literal(value=2)), operator=+, right=Variable(name=x))), type=Int()))")
     }
 
     @Test
@@ -107,7 +107,7 @@ class FilesTest {
             """)
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "Function(name=test2, parameters=[Parameter(name=x, type=int)], body=[VariableDefinition(type='int', name=x, initializer=Binary(left=Binary(left=Literal(value=1), operator=+, right=Literal(value=2)), operator=+, right=Variable(name=x))), Expression(expression=Variable(name=x))], returntype=int)")
+        assertEquals(ast[0].toString(), "Function(name=test2, parameters=[Parameter(name=x, type=int)], body=[VariableDefinition(type='int', name=x, initializer=Binary(left=Binary(left=Literal(value=1), operator=+, right=Literal(value=2)), operator=+, right=Variable(name=x)))], returntype=ReturnValue(value=Expression(expression=Variable(name=x)), type=Int()))")
     }
 
     @Test
@@ -120,7 +120,7 @@ class FilesTest {
             """)
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "Function(name=test3, parameters=[Parameter(name=x, type=int)], body=[If(condition=Binary(left=Variable(name=x), operator=>=, right=Literal(value=3)), thenBranch=[Expression(expression=Literal(value=3))], elseBranch=[])], returntype=int)")
+        assertEquals(ast[0].toString(), "Function(name=test3, parameters=[Parameter(name=x, type=int)], body=[], returntype=ReturnValue(value=If(condition=Binary(left=Variable(name=x), operator=>=, right=Literal(value=3)), thenBranch=[Expression(expression=Literal(value=3))], elseBranch=[]), type=Int()))")
     }
 
     @Ignore
