@@ -63,7 +63,8 @@ fun compile(file: String) {
     }
 
     val llfile = compiler.toLLFile(ast)
-    val exefile = compiler.compile(llfile, "./output.exe")
-    llfile.delete()
+    val out: String = if (OS.getCurrentOS() == OS.OS.LINUX || OS.getCurrentOS() == OS.OS.MAC) "./a.bc" else "./a.exe"
+    val exefile = compiler.compile(llfile, out)
+    //llfile.delete()
 }
 

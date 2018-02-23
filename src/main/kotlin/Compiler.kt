@@ -80,31 +80,47 @@ define void @main() #0 {
 
     fun compile(llfile: File, path: String): File {
         val exefile = File(path)
-        val clangPath: String?
+
         when (OS.getCurrentOS()) {
             OS.OS.WINDOWS -> {
-                clangPath = System.getenv("LLVM_HOME")
+                val clangPath: String? = System.getenv("LLVM_HOME")
                 if (clangPath == "") {
                     println("You must define LLVM_HOME environment variable!\nPlease refer to the documentation https://google.com")
                     exitProcess(2)
                 }
+                val proc = Runtime.getRuntime().exec("""cmd /C $clangPath/bin/clang.exe ${llfile.absolutePath} -o ${exefile.absoluteFile}""")
+                Scanner(proc.inputStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                Scanner(proc.errorStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
             }
             OS.OS.LINUX, OS.OS.MAC -> {
-                clangPath = ""
+                println("LL file: ${llfile.absolutePath}")
+                var proc = Runtime.getRuntime().exec("""llvm-as ${llfile.absolutePath} -o ${exefile.absolutePath}""")
+                Scanner(proc.inputStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                Scanner(proc.errorStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                proc = Runtime.getRuntime().exec("""llc -march=x86-64 -filetype=obj a.bc -o a.o""")
+                Scanner(proc.inputStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                Scanner(proc.errorStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                proc = Runtime.getRuntime().exec("""clang a.o -o a.out""")
+                Scanner(proc.inputStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                Scanner(proc.errorStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
             }
-            else -> clangPath = ""
-        }
-
-        if (clangPath == "") {
-            println("Unable to find clang or LLVM, please verify your installation")
-            exitProcess(3)
-        }
-        val proc = Runtime.getRuntime().exec("""cmd /C $clangPath/bin/clang.exe ${llfile.absoluteFile} -o ${exefile.absoluteFile}""")
-        Scanner(proc.inputStream).use {
-            while (it.hasNextLine()) println(it.nextLine())
-        }
-        Scanner(proc.errorStream).use {
-            while (it.hasNextLine()) println(it.nextLine())
+            else -> println("OS is not supported, compilation disabled.")
         }
 
         return exefile
