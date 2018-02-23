@@ -14,6 +14,7 @@ enum class TokenType {
     //types
     STRING_TYPE,
     INT_TYPE,
+    DOUBLE_TYPE,
     VOID_TYPE,
     CHAR_TYPE,
 

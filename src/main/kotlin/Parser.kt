@@ -191,7 +191,7 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         return Stmt.VariableDefinition(type, name, initializer)
     }
 
-    private fun forStmt() : Stmt {
+    private fun forStmt(): Stmt {
         val identifierAssigned = consume(TokenType.IDENTIFIER, "Expect identifier")
         consume(TokenType.EQUAL, "Expect '=' after identifier")
         val condition = expression()
@@ -277,12 +277,31 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
         consume(TokenType.COLON, "Expect ':' after function definition")
         val returntype = consume(this.typeList, "Expect parameter type.")
-        val body = block()
+        println("return type: $returntype")
+
+        val body: MutableList<Stmt> = block()
+
         consume(TokenType.SEMICOLON, "Expect ';' after function body")
-        return Stmt.Function(name, parameters, body, returntype)
+
+        val returnStatement = body.last()
+        body.removeAt(body.size - 1)
+
+        val ret: Expr.ReturnValue = Expr.ReturnValue(returnStatement, this.ToType(returntype))
+        return Stmt.Function(name, parameters, body, ret)
     }
 
-    private fun block(): List<Stmt> {
+    private fun ToType(returntype: Token): Type {
+        return when (returntype.type) {
+            TokenType.CHAR_TYPE -> Type.Char()
+            TokenType.VOID_TYPE -> Type.Void()
+            TokenType.STRING_TYPE -> Type.Str()
+            TokenType.INT_TYPE -> Type.Int()
+            TokenType.DOUBLE_TYPE -> Type.Double()
+            else -> Type.Void()
+        }
+    }
+
+    private fun block(): MutableList<Stmt> {
         val statements = ArrayList<Stmt>()
 
         while (!this.isAtEnd) {

@@ -117,6 +117,16 @@ abstract class Expr {
         }
     }
 
+    internal class ReturnValue(val value: Stmt, val type: Type) : Expr() {
+        override fun getCode(): String {
+            return "${type.getCode()} (${value.getCode()})"
+        }
+
+        override fun toString(): String {
+            return "ReturnValue(value=$value, type=$type)"
+        }
+    }
+
     abstract fun getCode(): String
     abstract override fun toString(): String
 }

@@ -50,20 +50,22 @@ abstract class Stmt {
         }
     }
 
-    internal class Function(val name: Token, val parameters: List<Parameter>, val body: List<Stmt>, val returntype: Token) : Stmt() {
+    internal class Function(val name: Token, val parameters: List<Parameter>, val body: List<Stmt>, val returntype: Expr.ReturnValue) : Stmt() {
         override fun toString(): String {
             return "Function(name=$name, parameters=$parameters, body=$body, returntype=$returntype)"
         }
 
         override fun getCode(): String {
             var bodyCode = ""
+
             body.forEach { bodyCode += it.getCode() }
 
+
             return """
-define void @${name.lexeme}(${parameters.joinToString { "i32 %" + it.name }}) {
+define ${returntype.type.getCode()} @${name.lexeme}(${parameters.joinToString { "i32 %" + it.name }}) {
 entry:
   $bodyCode
-  ret void
+  ret ${returntype.getCode()}
 }
                 """
         }

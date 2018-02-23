@@ -1,3 +1,4 @@
+import java.lang.Double.parseDouble
 import java.lang.Integer.parseInt
 
 class Lexer(private val source: String) {
@@ -112,17 +113,22 @@ class Lexer(private val source: String) {
     }
 
     private fun number() {
+        var isDouble: Boolean = false
         while (isDigit(peek())) advance()
 
         // Look for a fractional part.
         if (peek() == '.' && isDigit(peekNext())) {
+            isDouble = true
             // Consume the "."
             advance()
 
             while (isDigit(peek())) advance()
         }
 
-        addToken(TokenType.NUMBER, parseInt(source.substring(start, current)))
+        when (isDouble) {
+            true -> addToken(TokenType.NUMBER, parseDouble(source.substring(start, current)))
+            false -> addToken(TokenType.NUMBER, parseInt(source.substring(start, current)))
+        }
     }
 
     private fun peekNext(): Char {
@@ -195,7 +201,7 @@ class Lexer(private val source: String) {
             '>' -> addToken(if (this.match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
             ' ', '\t' -> Unit
 
-            '\'' -> Unit //TODO it's only temporary
+            '\'' -> Unit
 
             '\n' -> {
                 //addToken(TokenType.EOL)
