@@ -70,7 +70,6 @@ define void @main() #0 {
 }
 """
 
-
         val llfile = createTempFile("output", ".ll")
         llfile.deleteOnExit()
         llfile.printWriter().use { out -> out.println(outString) }
@@ -81,11 +80,24 @@ define void @main() #0 {
 
     fun compile(llfile: File, path: String): File {
         val exefile = File(path)
-        val clangPath: String? = System.getenv("LLVM_HOME")
-        if (clangPath == "")
-        {
-            println("You must define LLVM_HOME environment variable!\nPlease refer to the documentation https://google.com")
-            exitProcess(2)
+        val clangPath: String?
+        when (OS.getCurrentOS()) {
+            OS.OS.WINDOWS -> {
+                clangPath = System.getenv("LLVM_HOME")
+                if (clangPath == "") {
+                    println("You must define LLVM_HOME environment variable!\nPlease refer to the documentation https://google.com")
+                    exitProcess(2)
+                }
+            }
+            OS.OS.LINUX, OS.OS.MAC -> {
+                clangPath = ""
+            }
+            else -> clangPath = ""
+        }
+
+        if (clangPath == "") {
+            println("Unable to find clang or LLVM, please verify your installation")
+            exitProcess(3)
         }
         val proc = Runtime.getRuntime().exec("""cmd /C $clangPath/bin/clang.exe ${llfile.absoluteFile} -o ${exefile.absoluteFile}""")
         Scanner(proc.inputStream).use {
@@ -94,6 +106,7 @@ define void @main() #0 {
         Scanner(proc.errorStream).use {
             while (it.hasNextLine()) println(it.nextLine())
         }
+
         return exefile
     }
 }
