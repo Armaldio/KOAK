@@ -3,7 +3,7 @@ import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     println("--- Welcome to KOAK compiler ---")
-    println("""Detected ${System.getProperty("os.name")} OS""")
+    println("""Detected ${OS.getCurrentOS()} OS""")
     when (args.size) {
         0 -> repl()
         1 -> compile(args[0])
@@ -63,7 +63,8 @@ fun compile(file: String) {
     }
 
     val llfile = compiler.toLLFile(ast)
-    val exefile = compiler.compile(llfile, "./output.exe")
-    llfile.delete()
+    val out: String = if (OS.getCurrentOS() == OS.OS.LINUX || OS.getCurrentOS() == OS.OS.MAC) "./a.bc" else "./a.exe"
+    val exefile = compiler.compile(llfile, out)
+    //llfile.delete()
 }
 
