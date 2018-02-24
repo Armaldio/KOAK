@@ -4,7 +4,13 @@ import kotlin.system.exitProcess
 internal class Parser(private val tokens: List<Token>, val source: String, val filename: String) {
     private var current = 0
 
-    private val typeList = arrayListOf<TokenType>(TokenType.CHAR_TYPE, TokenType.VOID_TYPE, TokenType.STRING_TYPE, TokenType.INT_TYPE)
+    private val typeList = arrayListOf(
+            TokenType.CHAR_TYPE,
+            TokenType.VOID_TYPE,
+            TokenType.STRING_TYPE,
+            TokenType.INT_TYPE,
+            TokenType.DOUBLE_TYPE
+    )
     /**
      * Return true at the end of the file
      */
@@ -35,8 +41,9 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
                 match(TokenType.CLASS) -> classStmt()
                 match(TokenType.DEF) -> functionStmt()
                 match(TokenType.EXTERN) -> externStmt()
-                match(TokenType.STRING_TYPE) -> varDeclarationStmt("string")
-                match(TokenType.INT_TYPE) -> varDeclarationStmt("int")
+                match(TokenType.STRING_TYPE) -> varDeclarationStmt(TokenType.STRING_TYPE)
+                match(TokenType.INT_TYPE) -> varDeclarationStmt(TokenType.INT_TYPE)
+                match(TokenType.DOUBLE_TYPE) -> varDeclarationStmt(TokenType.DOUBLE_TYPE)
                 else -> statement()
             }
         } catch (error: ParseError) {
@@ -177,7 +184,7 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
     }
 
 
-    private fun varDeclarationStmt(type: String): Stmt {
+    private fun varDeclarationStmt(type: TokenType): Stmt {
         val name = consume(TokenType.IDENTIFIER, "Expect variable name.")
 
         var initializer: Expr? = null
@@ -186,7 +193,7 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         }
 
         //consume(TokenType.EOL, "Expect 'EOL' after variable declaration.")
-        return Stmt.VariableDefinition(type, name, initializer)
+        return Stmt.VariableDefinition(ToType(Token(type, "", "", 0, 0)), name, initializer)
     }
 
     private fun forStmt(): Stmt {
@@ -494,7 +501,7 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
 
     private fun report(line: Int, column: Int, message: String) {
         System.err.println("[line $line] Error: $message")
-        System.err.println(source.split("\n")[line - 1])
+        System.err.println(source.split("\n")[line])
         for (i in 1..(column - 1)) System.err.print(" ")
         System.err.println("^")
         //exitProcess(1)
@@ -572,7 +579,18 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         while (!isAtEnd) {
             if (previous().type === TokenType.EOL) return
 
-            if (peek().type == TokenType.CLASS || peek().type == TokenType.DEF || peek().type == TokenType.INT_TYPE || peek().type == TokenType.STRING_TYPE || peek().type == TokenType.FOR || peek().type == TokenType.IF || peek().type == TokenType.WHILE || peek().type == TokenType.PRINT || peek().type == TokenType.RETURN) return
+            if (
+                    peek().type == TokenType.CLASS ||
+                    peek().type == TokenType.DEF ||
+                    peek().type == TokenType.INT_TYPE ||
+                    peek().type == TokenType.STRING_TYPE ||
+                    peek().type == TokenType.FOR ||
+                    peek().type == TokenType.IF ||
+                    peek().type == TokenType.WHILE ||
+                    peek().type == TokenType.PRINT ||
+                    peek().type == TokenType.RETURN
+            )
+                return
 
             advance()
         }

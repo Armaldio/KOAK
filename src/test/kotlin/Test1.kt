@@ -30,9 +30,6 @@ class FilesTest {
             }
         }
 
-        println(files)
-        println(results)
-
         var i = 0
         files.forEach {
             val compiler = Compiler(it)
@@ -52,7 +49,6 @@ class FilesTest {
             }
 
             i++
-            println("-------------------------------------------")
         }
 
     }
@@ -62,7 +58,7 @@ class FilesTest {
         val ast = this.parse("int a = 3")
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "VariableDefinition(type='int', name=a, initializer=Literal(value=3))")
+        assertEquals(ast[0].toString(), "VariableDefinition(type='Int()', name=a, initializer=Literal(value=3))")
     }
 
     @Test
@@ -70,8 +66,7 @@ class FilesTest {
         val ast = this.parse("int a = 3 + 3")
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "VariableDefinition(type='int', name=a, initializer=Binary(left=Literal(value=3), operator=+, right=Literal(value=3)))")
-
+        assertEquals(ast[0].toString(), "VariableDefinition(type='Int()', name=a, initializer=Binary(left=Literal(value=3), operator=+, right=Literal(value=3)))")
     }
 
     @Test
@@ -79,7 +74,7 @@ class FilesTest {
         val ast = this.parse("int sum = add(10, 5)")
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "VariableDefinition(type='int', name=sum, initializer=Call(callee=Variable(name=add), paren=), arguments=[Literal(value=10), Literal(value=5)]))")
+        assertEquals(ast[0].toString(), "VariableDefinition(type='Int()', name=sum, initializer=Call(callee=Variable(name=add), paren=), arguments=[Literal(value=10), Literal(value=5)]))")
     }
 
     @Ignore
@@ -88,7 +83,7 @@ class FilesTest {
         val ast = this.parse("int sum = \"hello\"")
 
         assertTrue(ast.size == 1)
-        assertNotEquals(ast[0].toString(), "VariableDefinition(type='int', name=sum, initializer=Literal(value=hello))")
+        assertNotEquals(ast[0].toString(), "VariableDefinition(type='Int()', name=sum, initializer=Literal(value=hello))")
     }
 
     @Test
@@ -96,7 +91,7 @@ class FilesTest {
         val ast = this.parse("str language = \"koak\"")
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "VariableDefinition(type='string', name=language, initializer=Literal(value=koak))")
+        assertEquals(ast[0].toString(), "VariableDefinition(type='Str()', name=language, initializer=Literal(value=koak))")
     }
 
     @Test
@@ -133,7 +128,7 @@ class FilesTest {
             """)
 
         assertTrue(ast.size == 1)
-        assertEquals(ast[0].toString(), "Function(name=test2, parameters=[Parameter(name=x, type=int)], body=[VariableDefinition(type='int', name=x, initializer=Binary(left=Binary(left=Literal(value=1), operator=+, right=Literal(value=2)), operator=+, right=Variable(name=x)))], returntype=ReturnValue(value=Expression(expression=Variable(name=x)), type=Int()))")
+        assertEquals(ast[0].toString(), "Function(name=test2, parameters=[Parameter(name=x, type=int)], body=[VariableDefinition(type='Int()', name=x, initializer=Binary(left=Binary(left=Literal(value=1), operator=+, right=Literal(value=2)), operator=+, right=Variable(name=x)))], returntype=ReturnValue(value=Expression(expression=Variable(name=x)), type=Int()))")
     }
 
     @Test
@@ -149,13 +144,13 @@ class FilesTest {
         assertEquals(ast[0].toString(), "Function(name=test3, parameters=[Parameter(name=x, type=int)], body=[], returntype=ReturnValue(value=If(condition=Binary(left=Variable(name=x), operator=>=, right=Literal(value=3)), thenBranch=[Expression(expression=Literal(value=3))], elseBranch=[]), type=Int()))")
     }
 
-    @Ignore
     @Test(expected = Exception::class)
     fun function_definition_missing_type() {
         val ast = this.parse("def add(x: int, y): x + y;")
     }
 
     @Test
+    @Ignore
     fun function_compiles_and_output_15() {
         val ast = this.parse("""
             int x = 15
@@ -163,7 +158,7 @@ class FilesTest {
             """)
 
         assertTrue(ast.size == 2)
-        assertEquals(ast[0].toString(), "VariableDefinition(type='int', name=x, initializer=Literal(value=15))")
+        assertEquals(ast[0].toString(), "VariableDefinition(type='Int()', name=x, initializer=Literal(value=15))")
         assertEquals(ast[1].toString(), "Print(expression=Grouping(expression=Variable(name=x)))")
 
         val compiler = Compiler("./tmp")

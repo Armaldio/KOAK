@@ -19,6 +19,7 @@ class Lexer(private val source: String) {
             "void" to TokenType.VOID_TYPE,
             "int" to TokenType.INT_TYPE,
             "char" to TokenType.CHAR_TYPE,
+            "double" to TokenType.DOUBLE_TYPE,
             "def" to TokenType.DEF,
             "if" to TokenType.IF,
             "then" to TokenType.THEN,

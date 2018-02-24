@@ -1,5 +1,10 @@
-while (y < ymax || n > 12) do
+while y < ymax || n > 12 do
     printdensity(mandelconverge(x,y)) : print(12) : patate() maniaque = 12
 endOf(10, "lama")
 
 for x = xmin, x < xmax, xstep in printdensity(mandelconverge(x,y)) : putchard(10)
+
+#for y = ymin, y < ymax, ystep in (
+#        (for x = xmin, x < xmax, xstep in
+#            printdensity(mandelconverge(x,y)))
+#        : putchard(10))

@@ -107,7 +107,7 @@ call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.st
     /**
      * Variable definition
      */
-    internal class VariableDefinition(val type: String, val name: Token, val initializer: Expr?) : Stmt() {
+    internal class VariableDefinition(val type: Type, val name: Token, val initializer: Expr?) : Stmt() {
         override fun toString(): String {
             return "VariableDefinition(type='$type', name=$name, initializer=$initializer)"
         }
