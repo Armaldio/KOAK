@@ -58,7 +58,7 @@ class Compiler(file: String) {
         // rest
         outString += """
 define void @main() #0 {
-    entry:
+entry:
         """
         ast.forEach {
             outString += it.getCode()
@@ -73,6 +73,9 @@ define void @main() #0 {
         val llfile = createTempFile("output", ".ll")
         llfile.deleteOnExit()
         llfile.printWriter().use { out -> out.println(outString) }
+
+        // Debug
+        val f = File(".llfile.ll").printWriter().use { out -> out.println(outString) }
 
         return llfile
     }

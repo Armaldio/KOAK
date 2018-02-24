@@ -42,7 +42,7 @@ abstract class Stmt {
 
     internal class Extern(val name: Token, val parameters: List<Parameter>, val returntype: Token) : Stmt() {
         override fun toString(): String {
-            return "Extern Function(name=$name, parameters=$parameters, returntype=$returntype)"
+            return "ExternFunction(name=$name, parameters=$parameters, returntype=$returntype)"
         }
 
         override fun getCode(): String {
@@ -65,7 +65,7 @@ abstract class Stmt {
 define ${returntype.type.getCode()} @${name.lexeme}(${parameters.joinToString { "i32 %" + it.name }}) {
 entry:
   $bodyCode
-  ret ${returntype.getCode()}
+  ${returntype.getCode()}
 }
                 """
         }

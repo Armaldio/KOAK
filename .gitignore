@@ -69,3 +69,4 @@ modules.xml
 *.ll
 *.c
 dist/
+*.exe

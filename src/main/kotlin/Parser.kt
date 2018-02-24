@@ -147,8 +147,6 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         consume(TokenType.THEN, "Expect then")
         val thenBranch: List<Stmt> = block()
 
-        println(thenBranch)
-
         var elseBranch: List<Stmt> = listOf()
         if (match(TokenType.ELSE)) {
             elseBranch = block()
@@ -277,7 +275,6 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
         consume(TokenType.COLON, "Expect ':' after function definition")
         val returntype = consume(this.typeList, "Expect parameter type.")
-        println("return type: $returntype")
 
         val body: MutableList<Stmt> = block()
 

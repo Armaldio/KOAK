@@ -1,0 +1,2 @@
+VariableDefinition(type='int', name=x, initializer=Literal(value=15))
+Print(expression=Grouping(expression=Variable(name=x)))

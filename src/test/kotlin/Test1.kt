@@ -1,6 +1,7 @@
 import org.junit.Assert.*
 import org.junit.Ignore
 import org.junit.Test
+import java.io.File
 
 class FilesTest {
 
@@ -18,17 +19,42 @@ class FilesTest {
     }
 
     @Test
-    @Ignore
-    fun test() {
+    fun test_all_test_files() {
+        val files = mutableListOf<String>()
+        val results = mutableListOf<String>()
 
-        val compiler = Compiler("example/test.koak")
-        val ast = compiler.getAST()
+        File("src/test/kotlin/").walkTopDown().forEach {
+            if (it.extension == "koak") {
+                files.add(it.absolutePath)
+                results.add(File(it.absolutePath.replace("koak", "result")).absolutePath)
+            }
+        }
 
-        assertEquals(ast.size, 2)
-        assertTrue(ast[0] is Stmt.Function)
+        println(files)
+        println(results)
 
-        //quickly test the output
-        assertEquals("Function(name=add, parameters=[Parameter(name=x, type=int), Parameter(name=y, type=int)], body=Binary(left=Variable(name=x), operator=+, right=Variable(name=y)))", ast[0].toString())
+        var i = 0
+        files.forEach {
+            val compiler = Compiler(it)
+            val ast = compiler.getAST()
+
+            val result = File(results[i]).readLines()
+            var lines = 0
+            File(results[i]).forEachLine { lines++ }
+
+            assertEquals(ast.size, lines)
+
+
+            var j = 0
+            ast.forEach {
+                assertEquals(it.toString(), result[j])
+                j++
+            }
+
+            i++
+            println("-------------------------------------------")
+        }
+
     }
 
     @Test
@@ -127,5 +153,29 @@ class FilesTest {
     @Test(expected = Exception::class)
     fun function_definition_missing_type() {
         val ast = this.parse("def add(x: int, y): x + y;")
+    }
+
+    @Test
+    fun function_compiles_and_output_15() {
+        val ast = this.parse("""
+            int x = 15
+            print(x)
+            """)
+
+        assertTrue(ast.size == 2)
+        assertEquals(ast[0].toString(), "VariableDefinition(type='int', name=x, initializer=Literal(value=15))")
+        assertEquals(ast[1].toString(), "Print(expression=Grouping(expression=Variable(name=x)))")
+
+        val compiler = Compiler("./tmp")
+
+        val llfile = compiler.toLLFile(ast)
+        val tempCompiledFile = createTempFile("output", ".exe")
+        tempCompiledFile.deleteOnExit()
+        val compiledFile = compiler.compile(llfile, tempCompiledFile.absolutePath)
+
+        val out = execute(compiledFile.absolutePath)
+
+        assertEquals(out, "15")
+
     }
 }

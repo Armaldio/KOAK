@@ -44,14 +44,20 @@ ready> """)
     } while (text !== null)
 }
 
-fun execute(filename: String) {
+fun execute(filename: String): String {
+    var output = ""
     val proc = Runtime.getRuntime().exec("""cmd /C $filename""")
     Scanner(proc.inputStream).use {
-        while (it.hasNextLine()) println(it.nextLine())
+        while (it.hasNextLine()) {
+            val line = it.nextLine()
+            output += line
+            println(line)
+        }
     }
     Scanner(proc.errorStream).use {
         while (it.hasNextLine()) println(it.nextLine())
     }
+    return output
 }
 
 fun compile(file: String) {
