@@ -1,0 +1,6 @@
+double w = 8.3
+int x = 15
+str y = "koak"
+print(x)
+print(w)
+print(y)

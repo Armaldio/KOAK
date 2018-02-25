@@ -1,3 +1,4 @@
+import java.lang.Double.parseDouble
 import java.lang.Integer.parseInt
 
 class Lexer(private val source: String) {
@@ -14,8 +15,11 @@ class Lexer(private val source: String) {
             "else" to TokenType.ELSE,
             "false" to TokenType.FALSE,
             "for" to TokenType.FOR,
-            "string" to TokenType.STRING_TYPE,
+            "str" to TokenType.STRING_TYPE,
+            "void" to TokenType.VOID_TYPE,
             "int" to TokenType.INT_TYPE,
+            "char" to TokenType.CHAR_TYPE,
+            "double" to TokenType.DOUBLE_TYPE,
             "def" to TokenType.DEF,
             "if" to TokenType.IF,
             "then" to TokenType.THEN,
@@ -26,7 +30,10 @@ class Lexer(private val source: String) {
             "super" to TokenType.SUPER,
             "this" to TokenType.THIS,
             "true" to TokenType.TRUE,
-            "while" to TokenType.WHILE
+            "while" to TokenType.WHILE,
+            "do" to TokenType.DO,
+            "extern" to TokenType.EXTERN,
+            "in" to TokenType.IN
     )
 
     fun scanTokens(): MutableList<Token> {
@@ -94,7 +101,6 @@ class Lexer(private val source: String) {
             return
         }
 
-        // The closing ".
         advance()
 
         // Trim the surrounding quotes.
@@ -107,17 +113,21 @@ class Lexer(private val source: String) {
     }
 
     private fun number() {
+        var isDouble: Boolean = false
         while (isDigit(peek())) advance()
 
         // Look for a fractional part.
         if (peek() == '.' && isDigit(peekNext())) {
-            // Consume the "."
+            isDouble = true
             advance()
 
             while (isDigit(peek())) advance()
         }
 
-        addToken(TokenType.NUMBER, parseInt(source.substring(start, current)))
+        when (isDouble) {
+            true -> addToken(TokenType.NUMBER, parseDouble(source.substring(start, current)))
+            false -> addToken(TokenType.NUMBER, parseInt(source.substring(start, current)))
+        }
     }
 
     private fun peekNext(): Char {
@@ -167,18 +177,32 @@ class Lexer(private val source: String) {
                 if (peek() == '\n')
                     advance()
             }
+            '|' -> {
+                when {
+                    this.match('|') -> addToken(TokenType.OR)
+                    this.match('=') -> addToken(TokenType.OR_ASSIGN)
+                    else -> {
+                        addToken(TokenType.PIPE)
+                    }
+                }
+            }
+            '&' -> {
+                when {
+                    this.match('&') -> addToken(TokenType.AND)
+                    this.match('=') -> addToken(TokenType.AND_ASSIGN)
+                    else -> addToken(TokenType.BINARY_AND)
+                }
+            }
             '/' -> if (match('/')) while (peek() != '\n' && !isAtEnd()) advance() else addToken(TokenType.SLASH)
             '!' -> addToken(if (this.match('=')) TokenType.NOT_EQUAL else TokenType.NOT)
             '=' -> addToken(if (this.match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
             '<' -> addToken(if (this.match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
             '>' -> addToken(if (this.match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
-
             ' ', '\t' -> Unit
 
-            '\'' -> Unit //TODO it's only temporary
+            '\'' -> Unit
 
             '\n' -> {
-                //addToken(TokenType.EOL)
                 line++
                 column = 0
             }
@@ -190,8 +214,6 @@ class Lexer(private val source: String) {
                 isAlpha(c) -> identifier()
                 else -> this.report(line, column, "", "Unexpected character.")
             }
-
         }
     }
-
 }

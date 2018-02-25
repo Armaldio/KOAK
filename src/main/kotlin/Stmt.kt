@@ -20,9 +20,9 @@ abstract class Stmt {
         }
     }
 
-    internal class Expression(val expression: Expr) : Stmt() {
+    internal class For(val tokens: List<Token>, val conditions: List<Expr>, val body: List<Stmt>) : Stmt() {
         override fun toString(): String {
-            return "Expression(expression=$expression)"
+            return "For(identifier=$tokens, conditions=$conditions, body=$body)"
         }
 
         override fun getCode(): String {
@@ -30,17 +30,42 @@ abstract class Stmt {
         }
     }
 
-    internal class Function(val name: Token, val parameters: List<Parameter>, val body: List<Stmt>, val returntype: Token) : Stmt() {
+    internal class Expression(val expression: Expr) : Stmt() {
+        override fun toString(): String {
+            return "Expression(expression=$expression)"
+        }
+
+        override fun getCode(): String {
+            return expression.getCode()
+        }
+    }
+
+    internal class Extern(val name: Token, val parameters: List<Parameter>, val returntype: Token) : Stmt() {
+        override fun toString(): String {
+            return "ExternFunction(name=$name, parameters=$parameters, returntype=$returntype)"
+        }
+
+        override fun getCode(): String {
+            return ""
+        }
+    }
+
+    internal class Function(val name: Token, val parameters: List<Parameter>, val body: List<Stmt>, val returntype: Expr.ReturnValue) : Stmt() {
         override fun toString(): String {
             return "Function(name=$name, parameters=$parameters, body=$body, returntype=$returntype)"
         }
 
         override fun getCode(): String {
+            var bodyCode = ""
+
+            body.forEach { bodyCode += it.getCode() }
+
+
             return """
-define void @${name.lexeme}(${parameters.joinToString { "i32 %" + it.name }}) {
+define ${returntype.type.getCode()} @${name.lexeme}(${parameters.joinToString { "i32 %" + it.name }}) {
 entry:
-  ${body.forEach { it.getCode() }}
-  ret void
+  $bodyCode
+  ${returntype.getCode()}
 }
                 """
         }
@@ -63,8 +88,8 @@ entry:
 
         override fun getCode(): String {
             return """
-                ${expression.getCode()}_ = load i32, i32* ${expression.getCode()}, align 4
-                call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i32 0, i32 0), i32 ${expression.getCode()}_)
+${expression.getCode()}_ = load i32, i32* ${expression.getCode()}, align 4
+call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i32 0, i32 0), i32 ${expression.getCode()}_)
                 """
         }
     }
@@ -82,7 +107,7 @@ entry:
     /**
      * Variable definition
      */
-    internal class VariableDefinition(val type: String, val name: Token, val initializer: Expr?) : Stmt() {
+    internal class VariableDefinition(val type: Type, val name: Token, val initializer: Expr?) : Stmt() {
         override fun toString(): String {
             return "VariableDefinition(type='$type', name=$name, initializer=$initializer)"
         }
@@ -95,19 +120,9 @@ store i32 ${initializer?.getCode()}, i32* %${name.lexeme}, align 4
         }
     }
 
-    internal class While(val condition: Expr, val body: Stmt) : Stmt() {
+    internal class While(val condition: Expr, val body: List<Stmt>) : Stmt() {
         override fun toString(): String {
             return "While(condition=$condition, body=$body)"
-        }
-
-        override fun getCode(): String {
-            return ""
-        }
-    }
-
-    internal class Comment(val comment: Token) : Stmt() {
-        override fun toString(): String {
-            return "Comment(comment=$comment)"
         }
 
         override fun getCode(): String {

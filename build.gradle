@@ -1,9 +1,14 @@
+
 apply plugin: 'kotlin'
 apply plugin: 'application'
+
+mainClassName = "AppKt"
+
 //apply plugin: 'org.jetbrains.dokka'
 apply from: 'ColoredOutput.gradle'
+apply plugin: 'com.github.johnrengelman.shadow'
 
-mainClassName  = "AppKt"
+
 
 buildscript {
     ext.kotlin_version = '1.2.21'
@@ -15,6 +20,7 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
     }
 }
 
@@ -32,10 +38,29 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.4.1'
 }
 
-tasks.withType(Test) { 
-  testLogging {
-    //exceptionFormat "full"
-    //events "started", "skipped", "passed", "failed"
-    //showStandardStreams true
-  }
+tasks.withType(Test) {
+    testLogging {
+        //exceptionFormat "full"
+        //events "started", "skipped", "passed", "failed"
+        //showStandardStreams true
+    }
 }
+
+shadowJar {
+    baseName = 'koak'
+    classifier = null
+    version = null
+}
+
+task moveDist(type: Copy) {
+    from "./build/libs/KOAK.jar"
+    into "./dist"
+    rename { String fileName ->
+        fileName.replace("KOAK.jar", "koak.jar")
+    }
+}
+
+build.dependsOn shadowJar
+build.dependsOn moveDist
+
+

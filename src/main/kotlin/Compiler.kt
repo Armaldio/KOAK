@@ -1,17 +1,18 @@
 import java.io.File
 import java.util.Scanner
+import kotlin.system.exitProcess
 
 class Compiler(file: String) {
     private var _file: String = ""
     var hadError = false
 
-
     init {
         this._file = file
     }
 
-    fun getAST(): AST {
-        println("Compiling ${this._file}...")
+    fun getAST(silence: Boolean = false): AST {
+        if (!silence)
+            println("Compiling ${this._file}...")
 
         val source: String = File(this._file).readLines().joinToString(separator = "\n")
         val lexer = Lexer(source)
@@ -24,10 +25,16 @@ class Compiler(file: String) {
         val ast = AST()
         statements.filterNotNullTo(ast)
 
+        val interpreter = Interpreter(ast, this._file)
+
+        val value = interpreter.interpret()
+
         return ast
     }
 
-    fun toLLFile(ast: AST, filename: String) {
+    fun toLLFile(_ast: AST): File {
+        var ast = _ast
+
         var outString = ""
 
         // declarations
@@ -38,13 +45,22 @@ class Compiler(file: String) {
         outString += ""
 
         // functions
-        outString += ""
-
+        val newAst = AST()
+        ast.forEach {
+            when (it) {
+                is Stmt.Function -> {
+                    val code = it.getCode()
+                    outString += code
+                }
+                else -> newAst.add(it)
+            }
+        }
+        ast = newAst
 
         // rest
         outString += """
 define void @main() #0 {
-    entry:
+entry:
         """
         ast.forEach {
             outString += it.getCode()
@@ -56,17 +72,67 @@ define void @main() #0 {
 }
 """
 
+        val llfile = createTempFile("output", ".ll")
+        llfile.deleteOnExit()
+        llfile.printWriter().use { out -> out.println(outString) }
 
-        File("$filename.ll").printWriter().use { out -> out.println(outString) }
+        // Debug
+        //val f = File(".llfile.ll").printWriter().use { out -> out.println(outString) }
 
-        val clangPath: String? = System.getenv("LLVM_HOME")
-        println("Clang path: $clangPath")
-        val proc = Runtime.getRuntime().exec("cmd /C $clangPath/bin/clang.exe $filename.ll")
-        Scanner(proc.inputStream).use {
-            while (it.hasNextLine()) println(it.nextLine())
+        return llfile
+    }
+
+
+    fun compile(llfile: File, path: String): File {
+        val exefile = File(path)
+
+        when (OS.getCurrentOS()) {
+            OS.OS.WINDOWS -> {
+                val clangPath: String? = System.getenv("LLVM_HOME")
+                if (clangPath == "") {
+                    println("You must define LLVM_HOME environment variable!\nPlease refer to the documentation https://google.com")
+                    exitProcess(2)
+                }
+                val proc = Runtime.getRuntime().exec("""cmd /C $clangPath/bin/clang.exe ${llfile.absolutePath} -o ${exefile.absoluteFile}""")
+                Scanner(proc.inputStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                Scanner(proc.errorStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+            }
+            OS.OS.LINUX, OS.OS.MAC -> {
+                var proc = Runtime.getRuntime().exec("""llvm-as ${llfile.absolutePath} -o ${exefile.absolutePath}""")
+                Scanner(proc.inputStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                Scanner(proc.errorStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                proc = Runtime.getRuntime().exec("""llc -march=x86-64 -filetype=obj a.bc -o a.o""")
+                Scanner(proc.inputStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                Scanner(proc.errorStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                proc = Runtime.getRuntime().exec("""clang a.o -o a.out""")
+                Scanner(proc.inputStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                Scanner(proc.errorStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                proc = Runtime.getRuntime().exec("""rm a.bc a.o""")
+                Scanner(proc.inputStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                Scanner(proc.errorStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+            }
+            else -> println("OS is not supported, compilation disabled.")
         }
-        Scanner(proc.errorStream).use {
-            while (it.hasNextLine()) println(it.nextLine())
-        }
+        return exefile
     }
 }

@@ -1,12 +1,10 @@
-import Token
-
 abstract class Expr {
-       // Nested Expr classes here...
 
     internal class Assign(val name: Token, val value: Expr) : Expr() {
         override fun toString(): String {
             return "Assign(name=$name, value=$value)"
         }
+
         override fun getCode(): String {
             return ""
         }
@@ -16,8 +14,21 @@ abstract class Expr {
         override fun toString(): String {
             return "Binary(left=$left, operator=$operator, right=$right)"
         }
+
         override fun getCode(): String {
-            return ""
+            return when (operator.lexeme) {
+                "+" -> {
+                    """
+%bin = add nsw i32 ${left.getCode()}, ${right.getCode()}
+"""
+                }
+                "*" -> {
+                    """
+%bin = mul nsw i32 ${left.getCode()}, ${right.getCode()}
+"""
+                }
+                else -> ""
+            }
         }
     }
 
@@ -25,8 +36,9 @@ abstract class Expr {
         override fun toString(): String {
             return "Call(callee=$callee, paren=$paren, arguments=$arguments)"
         }
+
         override fun getCode(): String {
-            return ""
+            return "call i32 @${callee.getCode()}()"
         }
     }
 
@@ -34,6 +46,7 @@ abstract class Expr {
         override fun toString(): String {
             return "Get(`object`=$`object`, name=$name)"
         }
+
         override fun getCode(): String {
             return ""
         }
@@ -43,6 +56,7 @@ abstract class Expr {
         override fun toString(): String {
             return "Grouping(expression=$expression)"
         }
+
         override fun getCode(): String {
             return expression.getCode()
         }
@@ -52,6 +66,7 @@ abstract class Expr {
         override fun toString(): String {
             return "Literal(value=$value)"
         }
+
         override fun getCode(): String {
             return "$value"
         }
@@ -61,6 +76,7 @@ abstract class Expr {
         override fun toString(): String {
             return "Logical(left=$left, operator=$operator, right=$right)"
         }
+
         override fun getCode(): String {
             return ""
         }
@@ -70,6 +86,7 @@ abstract class Expr {
         override fun toString(): String {
             return "Set(`object`=$`object`, name=$name, value=$value)"
         }
+
         override fun getCode(): String {
             return ""
         }
@@ -79,6 +96,7 @@ abstract class Expr {
         override fun toString(): String {
             return "Super(keyword=$keyword, method=$method)"
         }
+
         override fun getCode(): String {
             return ""
         }
@@ -88,6 +106,7 @@ abstract class Expr {
         override fun toString(): String {
             return "This(keyword=$keyword)"
         }
+
         override fun getCode(): String {
             return ""
         }
@@ -110,6 +129,16 @@ abstract class Expr {
 
         override fun toString(): String {
             return "Variable(name=$name)"
+        }
+    }
+
+    internal class ReturnValue(val value: Stmt, val type: Type) : Expr() {
+        override fun getCode(): String {
+            return "ret ${type.getCode()} (${value.getCode()})"
+        }
+
+        override fun toString(): String {
+            return "ReturnValue(value=$value, type=$type)"
         }
     }
 

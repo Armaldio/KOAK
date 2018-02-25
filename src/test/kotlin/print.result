@@ -1,0 +1,6 @@
+VariableDefinition(type='Double()', name=w, initializer=Literal(value=8.3))
+VariableDefinition(type='Int()', name=x, initializer=Literal(value=15))
+VariableDefinition(type='Str()', name=y, initializer=Literal(value=koak))
+Print(expression=Grouping(expression=Variable(name=x)))
+Print(expression=Grouping(expression=Variable(name=w)))
+Print(expression=Grouping(expression=Variable(name=y)))
