@@ -1,12 +1,11 @@
 internal class Interpreter(private val stmts: AST, val source: String) {
     private var current: Int = 0
-    private class InterpreterError : RuntimeException();
+    private class InterpreterError : RuntimeException()
 
     fun interpret(): Boolean {
         while (this.current < stmts.count()) {
             when (stmts[this.current]) {
                 is Stmt.VariableDefinition -> this.varDefinition()
-                else -> print("Np")
             }
             this.current++
         }
@@ -19,9 +18,8 @@ internal class Interpreter(private val stmts: AST, val source: String) {
         when (variable.type) {
             is Type.Str -> this.checkStr(variable)
             is Type.Double -> this.checkDouble(variable)
-            is Type.Char -> this.checkChar(variable)
             is Type.Int -> this.checkInt(variable)
-            else -> print("error")
+            else -> throw Exception("Type not found")
         }
     }
 
@@ -36,13 +34,6 @@ internal class Interpreter(private val stmts: AST, val source: String) {
         val assign = variable.initializer as Expr.Literal
         if (assign.value !is Double) {
             this.error(variable.name, "Variable is not double")
-        }
-    }
-
-    private fun checkChar(variable: Stmt.VariableDefinition) {
-        val assign = variable.initializer as Expr.Literal
-        if (assign.value !is Char) {
-            this.error(variable.name, "Variable is not char")
         }
     }
 
@@ -63,7 +54,6 @@ internal class Interpreter(private val stmts: AST, val source: String) {
         System.err.println(source.split("\n")[line])
         for (i in 1..(column - 1)) System.err.print(" ")
         System.err.println("^")
-        //exitProcess(1)
         throw Exception(message)
     }
 }

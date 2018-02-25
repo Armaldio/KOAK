@@ -1,5 +1,4 @@
 int x = 12
 str lama = "doom"
 double doble = 10.2
-char ch = 'c'
-int error = "lama"
+int err = 10.2
