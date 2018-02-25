@@ -140,8 +140,8 @@ class FilesTest {
         val ast = this.parse("def add(x: int, y): x + y;")
     }
 
-    @Test
     @Ignore
+    @Test
     fun function_compiles_and_output_15() {
         val ast = this.parse("""
             int x = 15
@@ -162,5 +162,29 @@ class FilesTest {
         val out = execute(compiledFile.absolutePath)
 
         assertEquals(out, "15")
+    }
+
+    @Test(expected = Exception::class)
+    fun function_bad_type() {
+        val ast = this.parse("int x = \"lam\"")
+        val interpreter = Interpreter(ast, "test.koak")
+
+        interpreter.interpret()
+    }
+
+    @Test(expected = Exception::class)
+    fun function_bad_type_str() {
+        val ast = this.parse("str x = 12")
+        val interpreter = Interpreter(ast, "test.koak")
+
+        interpreter.interpret()
+    }
+
+    @Test(expected = Exception::class)
+    fun function_bad_type_int() {
+        val ast = this.parse("int x = 12.2")
+        val interpreter = Interpreter(ast, "test.koak")
+
+        interpreter.interpret()
     }
 }

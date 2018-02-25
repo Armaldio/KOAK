@@ -1,0 +1,4 @@
+for y = ymin, y < ymax, ystep in
+        for x = xmin, x < xmax, xstep in
+            printdensity(mandelconverge(x,y))
+        : putchard(10)
