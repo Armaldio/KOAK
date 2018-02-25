@@ -101,7 +101,6 @@ class Lexer(private val source: String) {
             return
         }
 
-        // The closing ".
         advance()
 
         // Trim the surrounding quotes.
@@ -120,7 +119,6 @@ class Lexer(private val source: String) {
         // Look for a fractional part.
         if (peek() == '.' && isDigit(peekNext())) {
             isDouble = true
-            // Consume the "."
             advance()
 
             while (isDigit(peek())) advance()
@@ -205,7 +203,6 @@ class Lexer(private val source: String) {
             '\'' -> Unit
 
             '\n' -> {
-                //addToken(TokenType.EOL)
                 line++
                 column = 0
             }
@@ -217,8 +214,6 @@ class Lexer(private val source: String) {
                 isAlpha(c) -> identifier()
                 else -> this.report(line, column, "", "Unexpected character.")
             }
-
         }
     }
-
 }

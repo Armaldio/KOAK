@@ -77,15 +77,6 @@ class FilesTest {
         assertEquals(ast[0].toString(), "VariableDefinition(type='Int()', name=sum, initializer=Call(callee=Variable(name=add), paren=), arguments=[Literal(value=10), Literal(value=5)]))")
     }
 
-    @Ignore
-    @Test
-    fun int_declaration_equals_string() {
-        val ast = this.parse("int sum = \"hello\"")
-
-        assertTrue(ast.size == 1)
-        assertNotEquals(ast[0].toString(), "VariableDefinition(type='Int()', name=sum, initializer=Literal(value=hello))")
-    }
-
     @Test
     fun string_declartion_equals_string() {
         val ast = this.parse("str language = \"koak\"")
@@ -171,6 +162,5 @@ class FilesTest {
         val out = execute(compiledFile.absolutePath)
 
         assertEquals(out, "15")
-
     }
 }

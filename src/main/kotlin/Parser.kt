@@ -26,7 +26,7 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         val statements = ArrayList<Stmt?>()
         while (!isAtEnd) {
             statements.add(declaration())
-            println(statements[statements.size - 1])
+            //println(statements[statements.size - 1])
         }
         return statements
     }
@@ -53,32 +53,6 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
 
     }
 
-
-    /*private fun classDeclaration(): Stmt {
-        val name = consume(TokenType.IDENTIFIER, "Expect class name.")
-
-
-        var superclass: Expr? = null
-        if (match(TokenType.LESS)) {
-            consume(TokenType.IDENTIFIER, "Expect superclass name.")
-            superclass = Expr.Variable(previous())
-        }
-
-
-        consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
-
-        val methods = ArrayList<Stmt.Function>()
-        while (!check(TokenType.RIGHT_BRACE) && !isAtEnd) {
-            methods.add(functionStmt("method"))
-        }
-
-        consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
-
-        return Stmt.Class(name, superclass, methods)
-
-    }*/
-
-
     private fun statement(): Stmt {
         return when {
             match(TokenType.FOR) -> forStmt()
@@ -91,65 +65,8 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         }
     }
 
-
-    /*private fun forStmt(): Stmt {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.")
-
-        val initializer: Stmt?
-        if (match(TokenType.EOL)) {
-            initializer = null
-        } else if (match(TokenType.VAR)) {
-            initializer = varDeclarationStmt()
-        } else {
-            initializer = expressionStmt()
-        }
-
-
-
-        var condition: Expr? = null
-        if (!check(TokenType.EOL)) {
-            condition = expression()
-        }
-        consume(TokenType.EOL, "Expect 'EOL' after loop condition.")
-
-
-
-        var increment: Expr? = null
-        if (!check(TokenType.RIGHT_PAREN)) {
-            increment = expression()
-        }
-        consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.")
-
-
-        var body = statement()
-
-
-        if (increment != null) {
-            body = Stmt.Block(Arrays.asList(
-                    body,
-                    Stmt.Expression(increment)))
-        }
-
-
-
-        if (condition == null) condition = Expr.Literal(true)
-        body = Stmt.While(condition, body)
-
-
-
-        if (initializer != null) {
-            body = Stmt.Block(Arrays.asList(initializer, body))
-        }
-
-
-        return body
-
-    }*/
-
-
     private fun ifStmt(): Stmt {
         val condition = expression()
-
 
         consume(TokenType.THEN, "Expect then")
         val thenBranch: List<Stmt> = block()
@@ -183,7 +100,6 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         return Stmt.Return(keyword, value)
     }
 
-
     private fun varDeclarationStmt(type: TokenType): Stmt {
         val name = consume(TokenType.IDENTIFIER, "Expect variable name.")
 
@@ -192,7 +108,6 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
             initializer = expression()
         }
 
-        //consume(TokenType.EOL, "Expect 'EOL' after variable declaration.")
         return Stmt.VariableDefinition(ToType(Token(type, "", "", 0, 0)), name, initializer)
     }
 
@@ -223,7 +138,6 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         return Stmt.While(condition, body)
     }
 
-
     private fun expressionStmt(): Stmt {
         val expr = expression()
         return Stmt.Expression(expr)
@@ -234,7 +148,6 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
     }
 
     private fun externStmt(): Stmt.Extern {
-        //consume(TokenType.EXTERN, "Expect extern identifier")
         val name = consume(TokenType.IDENTIFIER, "Expect function name")
 
         consume(TokenType.LEFT_PAREN, "Expect '(' after function name")
@@ -504,7 +417,6 @@ internal class Parser(private val tokens: List<Token>, val source: String, val f
         System.err.println(source.split("\n")[line])
         for (i in 1..(column - 1)) System.err.print(" ")
         System.err.println("^")
-        //exitProcess(1)
         throw Exception(message)
     }
 

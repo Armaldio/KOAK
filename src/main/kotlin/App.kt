@@ -32,7 +32,7 @@ ready> """)
         val compiler = Compiler(file.absolutePath)
         val ast = compiler.getAST(true)
 
-        ast.forEach { println(it.getCode()) }
+        //ast.forEach { println(it.getCode()) }
 
         val llfile = compiler.toLLFile(ast)
         val tempCompiledFile = createTempFile("output", ".exe")
@@ -51,7 +51,7 @@ fun execute(filename: String): String {
         while (it.hasNextLine()) {
             val line = it.nextLine()
             output += line
-            println(line)
+            //println(line)
         }
     }
     Scanner(proc.errorStream).use {
@@ -64,13 +64,9 @@ fun compile(file: String) {
     val compiler = Compiler(file)
     val ast = compiler.getAST()
 
-    for ((index, statement) in ast.withIndex()) {
-        System.out.println("$index: $statement")
-    }
-
     val llfile = compiler.toLLFile(ast)
     val out: String = if (OS.getCurrentOS() == OS.OS.LINUX || OS.getCurrentOS() == OS.OS.MAC) "./a.bc" else "./a.exe"
     val exefile = compiler.compile(llfile, out)
-    //llfile.delete()
+    llfile.delete()
 }
 

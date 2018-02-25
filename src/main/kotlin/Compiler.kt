@@ -6,7 +6,6 @@ class Compiler(file: String) {
     private var _file: String = ""
     var hadError = false
 
-
     init {
         this._file = file
     }
@@ -54,7 +53,6 @@ class Compiler(file: String) {
         }
         ast = newAst
 
-
         // rest
         outString += """
 define void @main() #0 {
@@ -75,7 +73,7 @@ entry:
         llfile.printWriter().use { out -> out.println(outString) }
 
         // Debug
-        val f = File(".llfile.ll").printWriter().use { out -> out.println(outString) }
+        //val f = File(".llfile.ll").printWriter().use { out -> out.println(outString) }
 
         return llfile
     }
@@ -100,7 +98,6 @@ entry:
                 }
             }
             OS.OS.LINUX, OS.OS.MAC -> {
-                println("LL file: ${llfile.absolutePath}")
                 var proc = Runtime.getRuntime().exec("""llvm-as ${llfile.absolutePath} -o ${exefile.absolutePath}""")
                 Scanner(proc.inputStream).use {
                     while (it.hasNextLine()) println(it.nextLine())
@@ -125,7 +122,6 @@ entry:
             }
             else -> println("OS is not supported, compilation disabled.")
         }
-
         return exefile
     }
 }
