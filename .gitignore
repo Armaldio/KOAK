@@ -70,3 +70,6 @@ modules.xml
 *.c
 dist/
 *.exe
+*.o
+
+*.bc
