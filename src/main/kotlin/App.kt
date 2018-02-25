@@ -2,17 +2,28 @@ import java.util.*
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
+    var debug = false
     println("--- Welcome to KOAK compiler ---")
     println("""Detected ${OS.getCurrentOS()} OS""")
-    when (args.size) {
-        0 -> repl()
-        1 -> compile(args[0])
+    var ac = args.size
+    var av  = mutableListOf<String>()
+    args.forEach {
+        if (it == "-d") {
+            ac--
+            debug = true
+        }
+        av.add(it)
+    }
+
+    when (ac) {
+        0 -> repl(debug)
+        1 -> compile(av[0], debug)
         else -> error("Too much parameters")
     }
     println("---           End           ---")
 }
 
-fun repl() {
+fun repl(debug: Boolean) {
     val file = createTempFile("repl")
     file.deleteOnExit()
 
@@ -32,7 +43,8 @@ ready> """)
         val compiler = Compiler(file.absolutePath)
         val ast = compiler.getAST(true)
 
-        //ast.forEach { println(it.getCode()) }
+        if (debug)
+            ast.forEach { println(it.getCode()) }
 
         val llfile = compiler.toLLFile(ast)
         val tempCompiledFile = createTempFile("output", ".exe")
@@ -60,9 +72,14 @@ fun execute(filename: String): String {
     return output
 }
 
-fun compile(file: String) {
+fun compile(file: String, debug: Boolean) {
     val compiler = Compiler(file)
     val ast = compiler.getAST()
+
+    if (debug)
+    {
+        ast.forEach { println(it) }
+    }
 
     val llfile = compiler.toLLFile(ast)
     val out: String = if (OS.getCurrentOS() == OS.OS.LINUX || OS.getCurrentOS() == OS.OS.MAC) "./a.bc" else "./a.exe"

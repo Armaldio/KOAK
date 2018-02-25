@@ -1,18 +1,2 @@
 int x = 15
 print(x)
-
-#def add(a: int, b: int): int
-#    int c = a + b:
-#    c
-#;
-#
-#def mult(c : int, d: int) : int
-#    int e = c * d:
-#    e
-#;
-#
-#int f = add(5, 3)
-#int g = mult(5, 3)
-#
-#print(f)
-#print(g)

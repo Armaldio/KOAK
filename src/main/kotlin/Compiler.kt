@@ -119,6 +119,13 @@ entry:
                 Scanner(proc.errorStream).use {
                     while (it.hasNextLine()) println(it.nextLine())
                 }
+                proc = Runtime.getRuntime().exec("""rm a.bc a.o""")
+                Scanner(proc.inputStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
+                Scanner(proc.errorStream).use {
+                    while (it.hasNextLine()) println(it.nextLine())
+                }
             }
             else -> println("OS is not supported, compilation disabled.")
         }
