@@ -149,6 +149,7 @@ class FilesTest {
         val ast = this.parse("def add(x: int, y): x + y;")
     }
 
+    @Ignore
     @Test
     @Ignore
     fun function_compiles_and_output_15() {

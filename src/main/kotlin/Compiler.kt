@@ -26,6 +26,10 @@ class Compiler(file: String) {
         val ast = AST()
         statements.filterNotNullTo(ast)
 
+        val interpreter = Interpreter(ast, this._file)
+
+        val value = interpreter.interpret()
+
         return ast
     }
 
